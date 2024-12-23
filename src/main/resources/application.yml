@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: carvana
+  datasource:
+    url: jdbc:postgresql://localhost:5432/carvana
+    username: postgres
+    password: 1234 # PostgreSQL 비밀번호 설정하실 때 변경하시면 됩니다
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
