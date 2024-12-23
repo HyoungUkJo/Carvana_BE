@@ -1,4 +1,4 @@
-package com.carvana.carvana;
+package com.carvana;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
