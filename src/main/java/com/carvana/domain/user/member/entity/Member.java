@@ -1,5 +1,6 @@
 package com.carvana.domain.user.member.entity;
 
+import com.carvana.domain.user.auth.entity.Auth;
 import com.carvana.domain.user.reservation.entity.Reservation;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -17,19 +18,16 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String email;
-    private String password;
     private String name;
     private String phone;
 
     @OneToMany(mappedBy = "member")
     private final List<Reservation> reservationList = new ArrayList<>();
 
-    public Member(Long id, String email, String password, String name, String phone) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
+    @OneToOne(mappedBy = "member")
+    private Auth auth;
+
+    public Member(String name, String phone) {
         this.name = name;
         this.phone = phone;
     }
