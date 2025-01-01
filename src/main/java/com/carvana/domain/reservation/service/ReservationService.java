@@ -10,6 +10,7 @@ import com.carvana.domain.store.carwash.entity.CarWash;
 import com.carvana.domain.store.carwash.entity.CarWashMenu;
 import com.carvana.domain.store.carwash.repository.CarWashMenuRepository;
 import com.carvana.domain.store.carwash.repository.CarWashRepository;
+import com.carvana.global.notification.service.FcmService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,9 @@ public class ReservationService {
 
     private final CarWashRepository carWashRepository;
     private final CarWashMenuRepository carWashMenuRepository;
+
+    // 임시로 FcmTokenService 의존성 주입해서 push 보내기
+    private final FcmService fcmService;
 
     // 예약 생성
     @Transactional
@@ -63,6 +67,10 @@ public class ReservationService {
 
         // 저장
         Reservation savedReservation = reservationRepository.save(reservation);
+
+        // 임시로 push를 예약 서비스에서 호출 -> 추후 이벤트 헨들러로 처리
+        fcmService.sendNewReservationNotification(reservation.getCarWash().getOwnerMember().getId(), reservation);
+
 
         // 결과
         return ReservationResponseDto.builder()

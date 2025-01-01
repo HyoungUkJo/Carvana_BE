@@ -3,12 +3,14 @@ package com.carvana.domain.store.carwash.entity;
 import com.carvana.domain.owner.member.entity.OwnerMember;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 @NoArgsConstructor
 public class CarWash {
 

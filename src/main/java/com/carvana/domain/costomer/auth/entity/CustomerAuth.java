@@ -1,6 +1,6 @@
-package com.carvana.domain.owner.auth.entity;
+package com.carvana.domain.costomer.auth.entity;
 
-import com.carvana.domain.owner.member.entity.OwnerMember;
+import com.carvana.domain.costomer.member.entity.CustomerMember;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class OwnerAuth {
+public class CustomerAuth {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,21 +25,26 @@ public class OwnerAuth {
 
     // Todo: 소셜 로그인 설정
 
+    // fcmToken (push알림을 위한 토큰)
+    private String fcmToken;
+
     // 멤버 연관관계 설정
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_member_id")
-    private OwnerMember ownerMember;
+    @JoinColumn(name = "customer_member_id")
+    private CustomerMember customerMember;
 
     @Builder
-    public OwnerAuth(String email, String password, OwnerMember ownerMember) {
+    public CustomerAuth(String email, String password, CustomerMember customerMember) {
         this.email = email;
         this.password = password;
-        this.ownerMember = ownerMember;
+        this.customerMember = customerMember;
+    }
+
+    public void updateFcmToken(String fcmToken){
+        this.fcmToken = fcmToken;
     }
 
 /*    public void updateRefreshToken(String refreshToken) {
        this.refreshToken = refreshToken;
     }*/
-
-
 }

@@ -1,9 +1,9 @@
 package com.carvana.domain.owner.auth.service;
 
-import com.carvana.domain.costomer.auth.dto.SignInRequestDto;
-import com.carvana.domain.costomer.auth.dto.SignInResponseDto;
-import com.carvana.domain.costomer.auth.dto.SignUpResponseDto;
-import com.carvana.domain.costomer.auth.dto.SignUpRequestDto;
+import com.carvana.domain.owner.auth.dto.SignInRequestDto;
+import com.carvana.domain.owner.auth.dto.SignInResponseDto;
+import com.carvana.domain.owner.auth.dto.SignUpResponseDto;
+import com.carvana.domain.owner.auth.dto.SignUpRequestDto;
 import com.carvana.domain.owner.auth.entity.OwnerAuth;
 import com.carvana.domain.owner.auth.repository.OwnerAuthRepository;
 import com.carvana.domain.owner.member.entity.OwnerMember;

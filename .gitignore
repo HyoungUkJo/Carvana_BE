@@ -34,6 +34,7 @@ out/
 /.nb-gradle/
 
 application.yml
+carvana-firebase-service-account.json
 
 ### VS Code ###
 .vscode/
