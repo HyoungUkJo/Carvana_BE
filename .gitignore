@@ -35,6 +35,7 @@ out/
 
 application.yml
 carvana-firebase-service-account.json
+secrets.properties
 
 ### VS Code ###
 .vscode/
