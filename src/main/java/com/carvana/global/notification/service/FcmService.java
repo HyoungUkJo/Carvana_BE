@@ -38,7 +38,7 @@ public class FcmService {
         return ownerFcmTokenRepository.save(fcmToken);
     }
 
-    //토큰 저장/ 갱신
+    //토큰 저장/ 갱신 -> 범용적으로 사용할 수 있도록 Owner을 제거할 수 있을것같음
     @Transactional
     public void saveOwnerToken(Long ownerId, String token) {
         // owner 검증
