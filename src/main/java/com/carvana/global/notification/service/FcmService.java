@@ -72,6 +72,7 @@ public class FcmService {
 
         try {
             firebaseMessaging.send(message);
+            log.info("Fcm발송 성공");
         } catch (FirebaseMessagingException e){
             log.error("FCM 발송 실패: {}", e.getMessage(),e);
         }
