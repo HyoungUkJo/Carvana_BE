@@ -3,6 +3,7 @@ package com.carvana.global.notification.service;
 import com.carvana.domain.owner.member.entity.OwnerMember;
 import com.carvana.domain.owner.member.repository.OwnerMemberRepository;
 import com.carvana.domain.reservation.entity.Reservation;
+import com.carvana.global.exception.custom.FCMException;
 import com.carvana.global.notification.entity.OwnerFcmToken;
 import com.carvana.global.notification.repository.CustomerFcmTokenRepository;
 import com.carvana.global.notification.repository.OwnerFcmTokenRepository;
@@ -75,6 +76,7 @@ public class FcmService {
             log.info("Fcm발송 성공");
         } catch (FirebaseMessagingException e){
             log.error("FCM 발송 실패: {}", e.getMessage(),e);
+            throw new FCMException("FCM 발송에 실패했습니다.");
         }
     }
 }
