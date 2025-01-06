@@ -1,6 +1,7 @@
 package com.carvana.global.exception;
 
 import com.carvana.global.exception.custom.DuplicateEmailException;
+import com.carvana.global.exception.custom.FCMException;
 import com.carvana.global.exception.custom.IncorrectEmailPasswordException;
 import com.carvana.global.exception.custom.dto.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
@@ -21,5 +22,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.CONFLICT)
             .body(new ErrorResponseDto("INCORRECT EMAIL OR PASSWORD", e.getMessage()));
+    }
+
+    //FCM Exception Handler
+    public ResponseEntity<ErrorResponseDto> handleFcmException(FCMException e) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(new ErrorResponseDto("Can't send Fcm Token", e.getMessage()));
     }
 }
