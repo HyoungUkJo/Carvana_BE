@@ -36,6 +36,8 @@ public class Reservation {
     @JoinColumn(name = "menu_id")
     private CarWashMenu menu;           // 세차 메뉴 엔티티
 
+    private String carType;             // 세차할 차종
+
     private LocalDateTime reservationDateTime;  // 예약 시간
 
     private String request; // 요청사항
@@ -48,7 +50,6 @@ public class Reservation {
     private LocalDateTime createAt;   // 예약 요청 시간
 
     @Builder
-
     public Reservation(Long id, CustomerMember customerMember, CarWash carWash,
                        CarWashMenu menu, LocalDateTime reservationDateTime,
                        String request, String imgUrl, LocalDateTime createAt) {
