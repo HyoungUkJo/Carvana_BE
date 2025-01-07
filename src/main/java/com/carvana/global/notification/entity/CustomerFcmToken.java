@@ -1,6 +1,6 @@
 package com.carvana.global.notification.entity;
 
-import com.carvana.domain.costomer.member.entity.CustomerMember;
+import com.carvana.domain.customer.member.entity.CustomerMember;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.carvana.domain.costomer.member.controller;
+package com.carvana.domain.customer.member.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

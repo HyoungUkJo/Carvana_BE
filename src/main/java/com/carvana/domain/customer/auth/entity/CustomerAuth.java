@@ -1,6 +1,6 @@
-package com.carvana.domain.costomer.auth.entity;
+package com.carvana.domain.customer.auth.entity;
 
-import com.carvana.domain.costomer.member.entity.CustomerMember;
+import com.carvana.domain.customer.member.entity.CustomerMember;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

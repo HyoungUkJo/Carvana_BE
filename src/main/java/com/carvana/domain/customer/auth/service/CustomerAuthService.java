@@ -1,13 +1,13 @@
-package com.carvana.domain.costomer.auth.service;
+package com.carvana.domain.customer.auth.service;
 
-import com.carvana.domain.costomer.auth.dto.SignInRequestDto;
-import com.carvana.domain.costomer.auth.dto.SignInResponseDto;
-import com.carvana.domain.costomer.auth.dto.SignUpResponseDto;
-import com.carvana.domain.costomer.auth.dto.SignUpRequestDto;
-import com.carvana.domain.costomer.auth.entity.CustomerAuth;
-import com.carvana.domain.costomer.auth.repository.CustomerAuthRepository;
-import com.carvana.domain.costomer.member.entity.CustomerMember;
-import com.carvana.domain.costomer.member.repository.CustomerMemberRepository;
+import com.carvana.domain.customer.auth.dto.SignInRequestDto;
+import com.carvana.domain.customer.auth.dto.SignInResponseDto;
+import com.carvana.domain.customer.auth.dto.SignUpResponseDto;
+import com.carvana.domain.customer.auth.dto.SignUpRequestDto;
+import com.carvana.domain.customer.auth.entity.CustomerAuth;
+import com.carvana.domain.customer.auth.repository.CustomerAuthRepository;
+import com.carvana.domain.customer.member.entity.CustomerMember;
+import com.carvana.domain.customer.member.repository.CustomerMemberRepository;
 import com.carvana.global.exception.custom.DuplicateEmailException;
 import com.carvana.global.exception.custom.IncorrectEmailPasswordException;
 import lombok.RequiredArgsConstructor;

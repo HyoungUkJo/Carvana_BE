@@ -1,4 +1,4 @@
-package com.carvana.domain.costomer.auth.dto;
+package com.carvana.domain.customer.auth.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,10 +1,10 @@
-package com.carvana.domain.costomer.auth.controller;
+package com.carvana.domain.customer.auth.controller;
 
-import com.carvana.domain.costomer.auth.dto.SignInRequestDto;
-import com.carvana.domain.costomer.auth.dto.SignInResponseDto;
-import com.carvana.domain.costomer.auth.dto.SignUpResponseDto;
-import com.carvana.domain.costomer.auth.service.CustomerAuthService;
-import com.carvana.domain.costomer.auth.dto.SignUpRequestDto;
+import com.carvana.domain.customer.auth.dto.SignInRequestDto;
+import com.carvana.domain.customer.auth.dto.SignInResponseDto;
+import com.carvana.domain.customer.auth.dto.SignUpResponseDto;
+import com.carvana.domain.customer.auth.service.CustomerAuthService;
+import com.carvana.domain.customer.auth.dto.SignUpRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

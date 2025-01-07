@@ -1,7 +1,7 @@
 package com.carvana.domain.reservation.service;
 
-import com.carvana.domain.costomer.member.entity.CustomerMember;
-import com.carvana.domain.costomer.member.repository.CustomerMemberRepository;
+import com.carvana.domain.customer.member.entity.CustomerMember;
+import com.carvana.domain.customer.member.repository.CustomerMemberRepository;
 import com.carvana.domain.reservation.dto.ReservationRequestDto;
 import com.carvana.domain.reservation.dto.ReservationResponseDto;
 import com.carvana.domain.reservation.entity.Reservation;

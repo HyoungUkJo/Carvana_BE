@@ -1,7 +1,6 @@
 package com.carvana.domain.reservation.entity;
 
-import com.carvana.domain.costomer.member.entity.CustomerMember;
-import com.carvana.domain.owner.member.entity.OwnerMember;
+import com.carvana.domain.customer.member.entity.CustomerMember;
 import com.carvana.domain.store.carwash.entity.CarWash;
 import com.carvana.domain.store.carwash.entity.CarWashMenu;
 import jakarta.persistence.*;

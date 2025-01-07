@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/notification")
-public class FcmController {
+@RequestMapping("/api/owner/notification")
+public class OwnerFcmController {
 
     private final FcmService fcmService;
     @PostMapping("/sendToken")

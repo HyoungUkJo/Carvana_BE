@@ -1,6 +1,6 @@
-package com.carvana.domain.costomer.auth.repository;
+package com.carvana.domain.customer.auth.repository;
 
-import com.carvana.domain.costomer.auth.entity.CustomerAuth;
+import com.carvana.domain.customer.auth.entity.CustomerAuth;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
