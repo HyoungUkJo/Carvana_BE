@@ -78,6 +78,8 @@ public class ReservationService {
             .reservationDateTime(savedReservation.getReservationDateTime())
             .request(savedReservation.getRequest())
             .imageUrl(savedReservation.getImgUrl())
+            .carType(savedReservation.getCarType())
+            .status(savedReservation.getStatus())
             .build();
 
     }
