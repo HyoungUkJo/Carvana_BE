@@ -1,6 +1,7 @@
 package com.carvana.domain.reservation.entity;
 
 import com.carvana.domain.customer.member.entity.CustomerMember;
+import com.carvana.domain.reservation.dto.ReservationUpdateRequestDto;
 import com.carvana.domain.store.carwash.entity.CarWash;
 import com.carvana.domain.store.carwash.entity.CarWashMenu;
 import jakarta.persistence.*;
@@ -47,6 +48,8 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status = ReservationStatus.PENDING;
 
+    private String rejectReason;
+
     private LocalDateTime createAt;   // 예약 요청 시간
 
     @Builder
@@ -61,5 +64,10 @@ public class Reservation {
         this.request = request;
         this.imgUrl = imgUrl;
         this.createAt = createAt;
+    }
+
+    public void updateStatus(ReservationUpdateRequestDto requestDto) {
+        this.status = requestDto.getStatus();
+        this.rejectReason = requestDto.getRejectReason();
     }
 }
