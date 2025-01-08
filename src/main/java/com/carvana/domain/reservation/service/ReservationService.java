@@ -5,6 +5,7 @@ import com.carvana.domain.customer.member.repository.CustomerMemberRepository;
 import com.carvana.domain.reservation.dto.ReservationRequestDto;
 import com.carvana.domain.reservation.dto.ReservationResponseDto;
 import com.carvana.domain.reservation.entity.Reservation;
+import com.carvana.domain.reservation.entity.ReservationStatus;
 import com.carvana.domain.reservation.repository.ReservationRepository;
 import com.carvana.domain.store.carwash.entity.CarWash;
 import com.carvana.domain.store.carwash.entity.CarWashMenu;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -81,6 +84,20 @@ public class ReservationService {
             .carType(savedReservation.getCarType())
             .status(savedReservation.getStatus())
             .build();
+    }
 
+    // 처리되지 않은 예약 요청
+    public List<ReservationResponseDto> requestReservation(Long ownerId, Long carWashId) {
+        List<Reservation> reservationList = reservationRepository.findByCarWashIdAndStatusOrderByCreateAtDesc(carWashId, ReservationStatus.PENDING);
+
+        return reservationList.stream()
+            .map(reservation -> ReservationResponseDto.builder()
+                .reservationId(reservation.getId())
+                .reservationDateTime(reservation.getReservationDateTime())
+                .request(reservation.getRequest())
+                .imageUrl(reservation.getImgUrl())
+                .carType(reservation.getCarType())
+                .status(reservation.getStatus())
+                .build()).collect(Collectors.toList());
     }
 }
