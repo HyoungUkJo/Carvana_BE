@@ -3,9 +3,11 @@ package com.carvana.domain.reservation.controller;
 import com.carvana.domain.reservation.dto.ReservationRequestDto;
 import com.carvana.domain.reservation.dto.ReservationResponseDto;
 import com.carvana.domain.reservation.service.ReservationService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "손님 예약", description = "예약과 관련된 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/customer/reservations")
