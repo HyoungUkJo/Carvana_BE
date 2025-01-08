@@ -2,11 +2,11 @@ package com.carvana.domain.reservation.service;
 
 import com.carvana.domain.customer.member.entity.CustomerMember;
 import com.carvana.domain.customer.member.repository.CustomerMemberRepository;
-import com.carvana.domain.reservation.dto.ReservationRequestDto;
-import com.carvana.domain.reservation.dto.ReservationResponseDto;
+import com.carvana.domain.reservation.dto.*;
 import com.carvana.domain.reservation.entity.Reservation;
 import com.carvana.domain.reservation.entity.ReservationStatus;
 import com.carvana.domain.reservation.repository.ReservationRepository;
+import com.carvana.domain.review.repository.ReviewRepository;
 import com.carvana.domain.store.carwash.entity.CarWash;
 import com.carvana.domain.store.carwash.entity.CarWashMenu;
 import com.carvana.domain.store.carwash.repository.CarWashMenuRepository;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,10 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     // MemberRepository필요
     private final CustomerMemberRepository customerMemberRepository;
+
+    // Review Repository
+    private final ReviewRepository reviewRepository;
+
     // 사진같은 파일을 올릴 FileUploadService도 필요
 
     private final CarWashRepository carWashRepository;
@@ -87,7 +92,7 @@ public class ReservationService {
     }
 
     // 처리되지 않은 예약 요청
-    public List<ReservationResponseDto> requestReservation(Long ownerId, Long carWashId) {
+    public List<ReservationResponseDto> requestedPendingReservation(Long carWashId) {
         List<Reservation> reservationList = reservationRepository.findByCarWashIdAndStatusOrderByCreateAtDesc(carWashId, ReservationStatus.PENDING);
 
         return reservationList.stream()
@@ -100,4 +105,44 @@ public class ReservationService {
                 .status(reservation.getStatus())
                 .build()).collect(Collectors.toList());
     }
+
+    // 일정 기간의 매출
+    public MonthlyStatsDto getMonthlyStats(Long carWashId) {
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).with(LocalTime.MIN);
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusNanos(1);
+
+        // 1. 예약리스트를가지고온다.
+        List<Reservation> completedReservations = reservationRepository.findByCarWashIdAndStatusAndReservationDateTimeBetweenOrderByReservationDateTime(
+            carWashId, ReservationStatus.COMPLETED, startOfMonth, endOfMonth
+        );
+
+        // 2. 리뷰를 가지고온다.
+        int reviewCount = reviewRepository.countByCarWashIdAndCreatedAtBetween(carWashId, startOfMonth, endOfMonth);
+
+        //3. 예약 리스트에서 예약 수와 매출액을 리뷰와 함께 return한다.
+        return MonthlyStatsDto.builder()
+            .totalReservation(completedReservations.size())
+            .totalRevenue(completedReservations.stream()
+                .mapToInt(revenue->revenue.getMenu().getPrice())
+                .sum())
+            .totalReviews(reviewCount)
+            .build();
+    }
+
+    // 예약 수락 거절
+    @Transactional
+    public ReservationUpdateResponseDto updateReservationstatus(Long reservationId, ReservationUpdateRequestDto requestDto) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+            .orElseThrow(() -> new EntityNotFoundException("예약을 찾을 수 없습니다."));
+
+        reservation.updateStatus(requestDto);
+
+
+        return ReservationUpdateResponseDto.builder()
+            .reservationId(reservationId)
+            .status(reservation.getStatus())
+            .updatedAt(LocalDateTime.now())
+            .build();
+    }
+
 }
