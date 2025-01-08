@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user/reservations")
-public class ReservationController {
+@RequestMapping("/api/customer/reservations")
+public class CustomerReservationController {
 
     private final ReservationService reservationService;
 
@@ -23,6 +23,4 @@ public class ReservationController {
         * */
         return reservationService.createReservation(requestDto);
     }
-
-    // owner 홈 화면 (일정,월간 매출 및 작업량, 리뷰)
 }
