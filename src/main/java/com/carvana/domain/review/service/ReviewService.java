@@ -16,7 +16,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
 
     //세차장 리뷰 전체 읽어오는 서비스 -> 추후 페이지네이션으로
-    public List<ReviewResponseDto> reviews(Long carWashId) {
+    public List<ReviewResponseDto> getAllReviews(Long carWashId) {
         List<Review> reviews = reviewRepository.findByCarWashIdOrderByCreatedAtDesc(carWashId);
 
         return reviews.stream()
