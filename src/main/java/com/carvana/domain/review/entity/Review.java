@@ -4,6 +4,7 @@ import com.carvana.domain.customer.member.entity.CustomerMember;
 import com.carvana.domain.reservation.entity.Reservation;
 import com.carvana.domain.store.carwash.entity.CarWash;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -51,6 +52,7 @@ public class Review {
                                                         // 추후 리뷰를 삭제시켰을때 이 이미지도 삭제시키는 로직 필요. (S3 기준인 array임)
 
 
+    @Builder
     public Review(Long id, Reservation reservation, CustomerMember customerMember, CarWash carWash, int rating, String content, List<String> imageUrls) {
         this.id = id;
         this.reservation = reservation;
@@ -62,4 +64,5 @@ public class Review {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
+
 }
