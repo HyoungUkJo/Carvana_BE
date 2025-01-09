@@ -18,8 +18,12 @@ public class OwnerMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
+
     private String phone;
+
+    private String businessNumber; //사업자 번호
 
     @OneToMany(mappedBy = "ownerMember")
     private final List<CarWash> carWashes = new ArrayList<>();
@@ -38,5 +42,9 @@ public class OwnerMember {
     public void addCarWash(CarWash carWash) {
         this.carWashes.add(carWash);
         carWash.setOwnerMember(this);
+    }
+
+    public void setBusinessNumber(String businessNumber) {
+        this.businessNumber = businessNumber;
     }
 }
