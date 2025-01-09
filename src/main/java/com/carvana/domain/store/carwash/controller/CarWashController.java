@@ -1,15 +1,9 @@
 package com.carvana.domain.store.carwash.controller;
 
-import com.carvana.domain.store.carwash.dto.RegisterCarWashMenuRequestDto;
-import com.carvana.domain.store.carwash.dto.RegisterCarWashMenuResponseDto;
-import com.carvana.domain.store.carwash.dto.RegisterCarWashRequestDto;
-import com.carvana.domain.store.carwash.dto.RegisterCarWashResponseDto;
+import com.carvana.domain.store.carwash.dto.*;
 import com.carvana.domain.store.carwash.service.CarWashService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/carwash")
@@ -25,14 +19,25 @@ public class CarWashController {
         // TODO: 추후 토큰으로 확인할 수 있도록 Auth도 의존관계 설정
         //
 
-        Long ownerId = 1L;
-        return carWashService.registerCarWash(registerCarWashRequestDto, ownerId);
+        return carWashService.registerCarWash(registerCarWashRequestDto);
     }
 
     @PostMapping("/{carWashId}/register/menues")
-    public RegisterCarWashMenuResponseDto registerCarWashMenu(@RequestBody RegisterCarWashMenuRequestDto registerCarWashMenuRequestDto) {
-        Long carWashId = 1L;
+    public RegisterCarWashMenuResponseDto registerCarWashMenu(@PathVariable Long carWashId, @RequestBody RegisterCarWashMenuRequestDto registerCarWashMenuRequestDto) {
         return carWashService.registerCarWashMenu(carWashId, registerCarWashMenuRequestDto);
     }
+
+    // 세차장 프로필 요청
+    @GetMapping("/{carWashId}/profile")
+    public CarWashProfileResponseDto getCarWashProfile(@PathVariable Long carWashId) {
+        return carWashService.getCarWashProfile(carWashId);
+    }
+
+    // 세차장 프로필 수정
+    @PostMapping("/{carWashId}/profile/update")
+    public CarWashProfileResponseDto updateCarWashProfile(@PathVariable Long carWashId, @RequestBody CarWashProfileUpdateRequestDto updateRequestDto) {
+        return carWashService.updateCarWashProfile(carWashId, updateRequestDto);
+    }
+
 
 }
