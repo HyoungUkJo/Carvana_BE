@@ -5,6 +5,7 @@ import com.carvana.domain.reservation.entity.ReservationStatus;
 import com.carvana.domain.reservation.service.ReservationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,9 +20,18 @@ public class OwnerReservationController {
     // owner 홈 화면 (일정,월간 매출 및 작업량, 리뷰)
 
     // 월간 매출 작업량 리뷰량
-    @GetMapping("/getMontlystats/{carWashId}")
+    @GetMapping("/{carWashId}/stats/monthly")
     public MonthlyStatsDto getMonthlyStats(@PathVariable Long carWashId) {
         return reservationService.getMonthlyStats(carWashId);
+    }
+    // 월간 예약 현황
+    @GetMapping("/{carWashId}/monthly")
+    public List<ReservationResponseDto> getMonthlyReservations(
+        @PathVariable Long carWashId,
+        @RequestParam int year,
+        @RequestParam int month
+    ){
+        return reservationService.getMonthlyReservation(carWashId, year, month);
     }
 
     // 요청된 처리되지 않은 예약 현황 (Pending상태)
