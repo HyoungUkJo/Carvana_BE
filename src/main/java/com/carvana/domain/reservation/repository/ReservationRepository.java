@@ -20,4 +20,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         LocalDateTime startOfMonth,
         LocalDateTime endOfMonth
     );
+
+    // 특정 기간의 예약을 조회
+    List<Reservation> findByCarWashIdAndReservationDateTimeBetweenOrderByReservationDateTime(
+        Long carWashId,
+        LocalDateTime startOfMonth,
+        LocalDateTime endOfMonth
+    );
 }
