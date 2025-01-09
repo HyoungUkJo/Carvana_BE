@@ -145,4 +145,21 @@ public class ReservationService {
             .build();
     }
 
+    // 한달간의 예약 현황
+    public List<ReservationResponseDto> getMonthlyReservation(Long carWashId, int year, int month) {
+        LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);
+        LocalDateTime end = start.plusMonths(1).minusNanos(1);
+        List<Reservation> reservations = reservationRepository.findByCarWashIdAndReservationDateTimeBetweenOrderByReservationDateTime(carWashId, start, end);
+
+        return reservations.stream()
+            .map(reservation -> ReservationResponseDto.builder()
+                .reservationId(reservation.getId())
+                .reservationDateTime(reservation.getReservationDateTime())
+                .carType(reservation.getCarType())
+                .request(reservation.getRequest())
+                .imageUrl(reservation.getImgUrl())
+                .status(reservation.getStatus())
+                .build()).collect(Collectors.toList());
+
+    }
 }
