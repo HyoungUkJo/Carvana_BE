@@ -67,6 +67,7 @@ public class ReservationService {
             .customerMember(customerMember)
             .carWash(carWash)
             .menu(carWashMenu)
+            .carType(request.getCarType())
             .reservationDateTime(request.getReservationDateTime())
             .request(request.getRequest())
             .createAt(LocalDateTime.now())
