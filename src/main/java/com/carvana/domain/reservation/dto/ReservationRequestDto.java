@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class ReservationRequestDto {
     private Long customerMemberID;      // 예약자 정보 -> Todo: 추후 토큰으로 대체
     private Long carWashId;             // 세차장 아이디
+    private String carType;             // 차종
     private Long menuId;                // 메뉴 아이디
     private LocalDateTime reservationDateTime;  // 예약일자
     private String request;             //  요청사항
