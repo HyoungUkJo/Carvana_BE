@@ -53,13 +53,20 @@ public class Reservation {
     private LocalDateTime createAt;   // 예약 요청 시간
 
     @Builder
-    public Reservation(Long id, CustomerMember customerMember, CarWash carWash,
-                       CarWashMenu menu, LocalDateTime reservationDateTime,
-                       String request, String imgUrl, LocalDateTime createAt) {
+    public Reservation(Long id,
+                       CustomerMember customerMember,
+                       CarWash carWash,
+                       CarWashMenu menu,
+                       String carType,
+                       LocalDateTime reservationDateTime,
+                       String request,
+                       String imgUrl,
+                       LocalDateTime createAt) {
         this.id = id;
         this.customerMember = customerMember;
         this.carWash = carWash;
         this.menu = menu;
+        this.carType = carType;
         this.reservationDateTime = reservationDateTime;
         this.request = request;
         this.imgUrl = imgUrl;
