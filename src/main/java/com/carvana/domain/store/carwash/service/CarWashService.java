@@ -2,9 +2,16 @@ package com.carvana.domain.store.carwash.service;
 
 import com.carvana.domain.owner.member.entity.OwnerMember;
 import com.carvana.domain.owner.member.repository.OwnerMemberRepository;
+import com.carvana.domain.reservation.dto.MonthlyStatsDto;
+import com.carvana.domain.reservation.entity.Reservation;
+import com.carvana.domain.reservation.entity.ReservationStatus;
+import com.carvana.domain.reservation.repository.ReservationRepository;
+import com.carvana.domain.review.repository.ReviewRepository;
 import com.carvana.domain.store.carwash.dto.*;
 import com.carvana.domain.store.carwash.entity.CarWash;
+import com.carvana.domain.store.carwash.entity.CarWashBusinessTarget;
 import com.carvana.domain.store.carwash.entity.CarWashMenu;
+import com.carvana.domain.store.carwash.repository.CarWashBusinessTargetRepository;
 import com.carvana.domain.store.carwash.repository.CarWashMenuRepository;
 import com.carvana.domain.store.carwash.repository.CarWashRepository;
 import com.carvana.global.exception.custom.IncorrectEmailPasswordException;
@@ -13,6 +20,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -20,6 +31,10 @@ public class CarWashService {
     private final CarWashRepository carWashRepository;
     private final OwnerMemberRepository ownerMemberRepository;
     private final CarWashMenuRepository carWashMenuRepository;
+    private final CarWashBusinessTargetRepository carWashBusinessTargetRepository;
+    private final ReservationRepository reservationRepository;
+    private final ReviewRepository reviewRepository;
+
     public RegisterCarWashResponseDto registerCarWash(RegisterCarWashRequestDto registerCarWashRequestDto) {
         // 실제 오너가 있는지 검증
         OwnerMember ownerMember = ownerMemberRepository.findById(registerCarWashRequestDto.getOwnerId()).orElseThrow(() -> new IncorrectEmailPasswordException("아이디 또는 비밀번호가 틀립니다."));
@@ -86,6 +101,53 @@ public class CarWashService {
             .phone(carWash.getPhone())
             .businessHours(carWash.getBusinessHours())
             .build();
+    }
+    public CarWashMonthlyStatsDto getMonthlyStats(Long carWashId) {
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).with(LocalTime.MIN);
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusNanos(1);
+
+        // 1. 예약리스트를가지고온다.
+        List<Reservation> reservations = reservationRepository.findByCarWashIdAndStatusAndReservationDateTimeBetweenOrderByReservationDateTime(
+            carWashId,
+            ReservationStatus.COMPLETED,
+            startOfMonth,
+            endOfMonth);
+
+        // 2. 리뷰를 가지고온다.
+        int reviewCount = reviewRepository.countByCarWashIdAndCreatedAtBetween(carWashId, startOfMonth, endOfMonth);
+
+        // 3. 목표치를 가지고온다.
+        CarWashBusinessTarget carWashBusinessTarget = carWashBusinessTargetRepository.findByCarWashId(carWashId).orElseGet(() -> CarWashBusinessTarget.builder()
+            .monthlyWorkloadTarget(0)
+            .monthlyRevenueTarget(0)
+            .monthlyReviewTarget(0)
+            .build());;
+
+        //4. 예약 리스트에서 예약 수와 매출액을 리뷰와 함께 return한다.
+        return CarWashMonthlyStatsDto.builder()
+            .totalWorkload(reservations.size())
+            .totalRevenue(reservations.stream()
+                .mapToInt(revenue -> revenue.getMenu().getPrice())
+                .sum())
+            .totalReviews(reviewCount)
+            .targetWorkload(carWashBusinessTarget.getMonthlyWorkloadTarget())
+            .targetRevenue(carWashBusinessTarget.getMonthlyRevenueTarget())
+            .targetReviews(carWashBusinessTarget.getMonthlyReviewTarget())
+            .build();
+    }
+
+    // 세차장 월간 작업량, 매출, 리뷰 목표 설정
+    @Transactional
+    public CarWashBusinessTarget setCarWashTarget(SetCarWashTargetRequestDto dto) {
+        CarWash carWash = carWashRepository.findById(dto.getCarWashId()).orElseThrow(() -> {
+            return new EntityNotFoundException("해당하는 세차장이 없습니다.");
+        });
+
+        return carWashBusinessTargetRepository.findByCarWashId(carWash.getId()).orElseGet(() -> CarWashBusinessTarget.builder()
+            .monthlyRevenueTarget(dto.getTargetRevenue())
+            .monthlyWorkloadTarget(dto.getTargetWorkload())
+            .monthlyReviewTarget(dto.getTargetReviews())
+            .build());
     }
 
 }

@@ -1,5 +1,6 @@
 package com.carvana.domain.store.carwash.controller;
 
+import com.carvana.domain.reservation.dto.MonthlyStatsDto;
 import com.carvana.domain.store.carwash.dto.*;
 import com.carvana.domain.store.carwash.service.CarWashService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,5 +48,11 @@ public class CarWashController {
         return carWashService.updateCarWashProfile(carWashId, updateRequestDto);
     }
 
+    // 월간 매출 작업량 리뷰량
+    @Operation(summary = "월간 매출 작업량 리뷰량", description = "월간 매출 작업량 리뷰량 API")
+    @GetMapping("/{carWashId}/stats/monthly")
+    public CarWashMonthlyStatsDto getMonthlyStats(@PathVariable Long carWashId) {
+        return carWashService.getMonthlyStats(carWashId);
+    }
 
 }
