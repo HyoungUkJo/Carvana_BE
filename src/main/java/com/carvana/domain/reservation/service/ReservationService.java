@@ -161,6 +161,23 @@ public class ReservationService {
                 .imageUrl(reservation.getImgUrl())
                 .status(reservation.getStatus())
                 .build()).collect(Collectors.toList());
+    }
 
+    // 예약 전체
+    public List<ReservationResponseDto> getMyReservation(Long customerId) {
+        CustomerMember customerMember = customerMemberRepository.findById(customerId).orElseThrow(() -> new EntityNotFoundException("요청한 회원이 없습니다."));
+
+        List<Reservation> reservations = reservationRepository.findByCustomerMemberId(customerId);
+
+        return reservations.stream()
+            .map(reservation -> ReservationResponseDto.builder()
+                .reservationId(reservation.getId())
+                .reservationDateTime(reservation.getReservationDateTime())
+                .carType(reservation.getCarType())
+                .request(reservation.getRequest())
+                .imageUrl(reservation.getImgUrl())
+                .status(reservation.getStatus())
+                .build())
+            .collect(Collectors.toList());
     }
 }
