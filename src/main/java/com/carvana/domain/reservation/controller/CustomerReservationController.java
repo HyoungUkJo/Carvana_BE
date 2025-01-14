@@ -7,6 +7,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 
 @Tag(name = "손님 예약", description = "예약과 관련된 API")
@@ -17,14 +20,37 @@ public class CustomerReservationController {
 
     private final ReservationService reservationService;
 
+    // 예약 가능일지 요청
+    @GetMapping("/{carWashId}/availableReservation")
+    public void getAvailableTime(@PathVariable Long carWashId,
+                                 @RequestParam(required = false) YearMonth yearMonth) {
+
+        //시간과 일자는 오늘 기준으로 서버가 설정
+        LocalDateTime nowTime = LocalDateTime.now();
+        LocalDate startDate = yearMonth.atDay(nowTime.getDayOfMonth()); // 위의 코드와 중복인지?
+        LocalDate endOfDate = yearMonth.atEndOfMonth();
+
+        // default는 현재 날짜 시간을 기준
+        if (yearMonth == null) {
+            yearMonth = YearMonth.now();
+        } else {
+            // 만약 다른 달이 들어왔을 경우 시간을 초기화
+            startDate = yearMonth.atDay(1);
+            nowTime = LocalDateTime.MIN;
+        }
+
+        // 날짜를 기준으로 디비 쿼리 조회
+
+        // Booking이 필요함. 30분 단위의 예약 가능여부
+
+
+    }
+
+
+
     // 예약 요청
-    @PostMapping("/requestReservation")
+    @PostMapping("/creatReservation")
     public ReservationResponseDto createReservation(@RequestBody ReservationRequestDto requestDto){
-        /*
-        * TODO : 데이터베이스 로직 연결
-        *  예약 시간 검증
-        *  가게 검증
-        * */
         return reservationService.createReservation(requestDto);
     }
 
