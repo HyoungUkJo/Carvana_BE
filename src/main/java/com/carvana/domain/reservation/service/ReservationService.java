@@ -177,6 +177,7 @@ public class ReservationService {
                 .imageUrl(reservation.getImgUrl())
                 .carType(reservation.getCarType())
                 .status(reservation.getStatus())
+                .menuName(reservation.getMenu().getMenuName())
                 .build()).collect(Collectors.toList());
     }
 
@@ -233,6 +234,7 @@ public class ReservationService {
                 .request(reservation.getRequest())
                 .imageUrl(reservation.getImgUrl())
                 .status(reservation.getStatus())
+                .menuName(reservation.getMenu().getMenuName())
                 .build()).collect(Collectors.toList());
     }
 
@@ -250,6 +252,7 @@ public class ReservationService {
                 .request(reservation.getRequest())
                 .imageUrl(reservation.getImgUrl())
                 .status(reservation.getStatus())
+                .menuName(reservation.getMenu().getMenuName())
                 .build())
             .collect(Collectors.toList());
     }
