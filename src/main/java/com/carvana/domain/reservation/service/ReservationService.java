@@ -78,6 +78,29 @@ public class ReservationService {
             .baySchedules(baySchedules)
             .build();
     }
+
+    // 베이의 유요한 타임 슬롯을 생성하는 함수
+    private List<TimeSlot> getAvailableTimeSlots(LocalDate date, List<Reservation> bayReservations){
+        // 새로운 타임슬롯 배열 생성
+        List<TimeSlot> timeSlots = new ArrayList<>();
+        LocalTime openTime = LocalTime.of(9, 0);
+        LocalTime closeTime = LocalTime.of(18, 0);
+        LocalTime tempTime = openTime;
+        while (tempTime.isBefore(closeTime)) {
+            // 현재 시간 이전의 데이터는 날린다.
+            if (date.equals(LocalDate.now()) && tempTime.isBefore(LocalTime.now())) {
+                tempTime = tempTime.plusMinutes(30);
+                continue;
+            }
+            LocalDateTime slotDateTime = date.atTime(tempTime);
+            // 예약되어 있는 예약과 시간이 겹치는지 확인이 필요.
+            boolean isAvailable = isTimeSlotAvailable(slotDateTime, bayReservations);
+            timeSlots.add(TimeSlot.builder().time(tempTime).available(isAvailable).build());
+            tempTime = tempTime.plusMinutes(30);
+
+        }
+        return timeSlots;
+    }
     // 예약 생성
     @Transactional
     public ReservationResponseDto createReservation(ReservationRequestDto request) {
