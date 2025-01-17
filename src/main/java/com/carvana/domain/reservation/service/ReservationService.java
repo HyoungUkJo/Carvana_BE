@@ -101,6 +101,18 @@ public class ReservationService {
         }
         return timeSlots;
     }
+
+    // 해당 시간에 예약이 있는지 검증하는 함수
+    private boolean isTimeSlotAvailable(LocalDateTime slotDateTime, List<Reservation> bayReservations) {
+        return bayReservations.stream()
+            .noneMatch(reservation -> {
+                LocalDateTime reservationStart = reservation.getReservationDateTime();
+                LocalDateTime reservationEnd = reservationStart.plusMinutes(reservation.getMenu().getDuration());
+                return !slotDateTime.isBefore(reservationStart) && slotDateTime.isBefore(reservationEnd);
+            });
+    }
+
+
     // 예약 생성
     @Transactional
     public ReservationResponseDto createReservation(ReservationRequestDto request) {
