@@ -71,6 +71,7 @@ public class ReservationService {
             .reservationDateTime(request.getReservationDateTime())
             .request(request.getRequest())
             .createAt(LocalDateTime.now())
+            .bayNumber(request.getBayNumber())
 //            .imgUrl(imageUrl)
             .build();
 
