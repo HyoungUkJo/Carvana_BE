@@ -41,6 +41,43 @@ public class ReservationService {
     // 임시로 FcmTokenService 의존성 주입해서 push 보내기
     private final FcmService fcmService;
 
+    // 예약 가능한 일자 확인
+    public DailyScheduleResponseDto getAvailableReservation(Long carWashId, LocalDate date) {
+
+
+        // 날짜를 기준으로 디비 쿼리 조회
+        List<Reservation> reservations = reservationRepository.findByCarWashIdAndStatusAndReservationDateTimeBetweenOrderByReservationDateTime(
+            carWashId,
+            ReservationStatus.CONFIRMED,
+            date.atStartOfDay(),
+            date.atTime(LocalTime.MAX));
+
+
+        // 베이 리스트 생성
+        List<BaySchedule> baySchedules = new ArrayList<>();
+
+        // 세차장 엔티티 조회
+        CarWash carWash = carWashRepository.findById(carWashId).orElseThrow(() -> new EntityNotFoundException("해당하는 세차장 정보가 없습니다."));
+
+        // 베이 조회
+        for (int i = 1; i <= carWash.getBayCount(); i++) {
+            final int bayNumber = i;
+            List<Reservation> bayReservations = reservations.stream()
+                .filter(reservation -> reservation.getBayNumber() == bayNumber)
+                .toList();
+            List<TimeSlot> availableSlots = getAvailableTimeSlots(date, bayReservations);
+
+            baySchedules.add(BaySchedule.builder()
+                .bayNumber(bayNumber)
+                .availableTimeSlot(availableSlots)
+                .build());
+        }
+
+        return DailyScheduleResponseDto.builder()
+            .date(date)
+            .baySchedules(baySchedules)
+            .build();
+    }
     // 예약 생성
     @Transactional
     public ReservationResponseDto createReservation(ReservationRequestDto request) {
