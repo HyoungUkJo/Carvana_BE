@@ -48,9 +48,11 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status = ReservationStatus.PENDING;
 
-    private String rejectReason;
+    private String rejectReason;       // 예약 거절 사유
 
     private LocalDateTime createAt;   // 예약 요청 시간
+
+    private Integer bayNumber;          // 예약 베이 번호
 
     @Builder
     public Reservation(Long id,
@@ -61,7 +63,9 @@ public class Reservation {
                        LocalDateTime reservationDateTime,
                        String request,
                        String imgUrl,
-                       LocalDateTime createAt) {
+                       LocalDateTime createAt,
+                       Integer bayNumber
+    ) {
         this.id = id;
         this.customerMember = customerMember;
         this.carWash = carWash;
@@ -71,6 +75,7 @@ public class Reservation {
         this.request = request;
         this.imgUrl = imgUrl;
         this.createAt = createAt;
+        this.bayNumber = bayNumber;
     }
 
     public void updateStatus(ReservationUpdateRequestDto requestDto) {
