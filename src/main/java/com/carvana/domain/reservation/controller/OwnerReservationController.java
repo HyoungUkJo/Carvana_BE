@@ -37,6 +37,13 @@ public class OwnerReservationController {
         return reservationService.getMonthlyReservation(carWashId, year, month);
     }
 
+    // 오늘 예약 현황
+    @Operation(summary = "오늘 예약 현황", description = "오늘 예약 현황")
+    @GetMapping("/{carWashId}/today")
+    public List<ReservationResponseDto> getTodayReservations(Long carWashId) {
+        return reservationService.getTodayReservation(carWashId);
+    }
+
     // 요청된 처리되지 않은 예약 현황 (Pending상태)
     // Todo: 지금은 예약 이미지를 한번에 넘겨주고 있는데 추후에는 요청하면 해당 reservation만 return하는 방식으로 (비용이 비쌈)
     @Operation(summary = "요청 예약 확인", description = "예약 상태가 PENDING인 예약 현황을 가지고온다.")
@@ -53,7 +60,7 @@ public class OwnerReservationController {
         "    COMPLETED   // 서비스 완료 예약 거절은 CANCELLED, 예약 수락은 CONFIRMED")
     @PatchMapping("/updateStatus/{reservationId}")
     public ReservationUpdateResponseDto updateReservationStatus(
-        @PathVariable Long reservationId, @RequestParam ReservationUpdateRequestDto requestDto) {
+        @PathVariable Long reservationId, @RequestBody ReservationUpdateRequestDto requestDto) {
         return reservationService.updateReservationstatus(reservationId, requestDto);
     }
 
