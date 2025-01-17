@@ -1,6 +1,8 @@
 package com.carvana.domain.reservation.dto;
 
 import com.carvana.domain.reservation.entity.ReservationStatus;
+import com.carvana.domain.store.carwash.entity.CarWash;
+import com.carvana.domain.store.carwash.entity.CarWashMenu;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,16 +22,18 @@ public class ReservationResponseDto {
     private String imageUrl;
     private String carType;
     private ReservationStatus status;
+    private String menuName;       // 예약한 메뉴
 
     @Builder
     public ReservationResponseDto(Long reservationId, LocalDateTime reservationDateTime,
                                   String request, String imageUrl, String carType,
-                                  ReservationStatus status) {
+                                  ReservationStatus status, String menuName) {
         this.reservationId = reservationId;
         this.reservationDateTime = reservationDateTime;
         this.request = request;
         this.imageUrl = imageUrl;
         this.carType = carType;
         this.status = status;
+        this.menuName = menuName;
     }
 }
