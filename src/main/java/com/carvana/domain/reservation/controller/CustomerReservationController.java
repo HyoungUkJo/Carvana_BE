@@ -1,8 +1,10 @@
 package com.carvana.domain.reservation.controller;
 
+import com.carvana.domain.reservation.dto.DailyScheduleResponseDto;
 import com.carvana.domain.reservation.dto.ReservationRequestDto;
 import com.carvana.domain.reservation.dto.ReservationResponseDto;
 import com.carvana.domain.reservation.service.ReservationService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,28 +23,11 @@ public class CustomerReservationController {
     private final ReservationService reservationService;
 
     // 예약 가능일지 요청
+    @Operation(summary = "해당 일자에 예약이 가능한지 확인", description = "예약 월 일을 선택하면 예약 가능한 시간은 return 해주는 api")
     @GetMapping("/{carWashId}/availableReservation")
-    public void getAvailableTime(@PathVariable Long carWashId,
-                                 @RequestParam(required = false) YearMonth yearMonth) {
-
-        //시간과 일자는 오늘 기준으로 서버가 설정
-        LocalDateTime nowTime = LocalDateTime.now();
-        LocalDate startDate = yearMonth.atDay(nowTime.getDayOfMonth()); // 위의 코드와 중복인지?
-        LocalDate endOfDate = yearMonth.atEndOfMonth();
-
-        // default는 현재 날짜 시간을 기준
-        if (yearMonth == null) {
-            yearMonth = YearMonth.now();
-        } else {
-            // 만약 다른 달이 들어왔을 경우 시간을 초기화
-            startDate = yearMonth.atDay(1);
-            nowTime = LocalDateTime.MIN;
-        }
-
-        // 날짜를 기준으로 디비 쿼리 조회
-
-        // Booking이 필요함. 30분 단위의 예약 가능여부
-
+    public DailyScheduleResponseDto getAvailableTime(@PathVariable Long carWashId,
+                                                       @RequestParam LocalDate date) {
+        return reservationService.getAvailableReservation(carWashId, date);
 
     }
 
