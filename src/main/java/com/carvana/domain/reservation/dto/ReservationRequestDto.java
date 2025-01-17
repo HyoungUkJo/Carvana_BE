@@ -17,5 +17,6 @@ public class ReservationRequestDto {
     private Long menuId;                // 메뉴 아이디
     private LocalDateTime reservationDateTime;  // 예약일자
     private String request;             //  요청사항
+    private Integer bayNumber;          // 예약할 베이 번호
 //    private MultipartFile requestImg;   // 사진첨부
 }
