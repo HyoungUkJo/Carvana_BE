@@ -253,4 +253,25 @@ public class ReservationService {
                 .build())
             .collect(Collectors.toList());
     }
+
+    // 오늘의 예약 현황
+    public List<ReservationResponseDto> getTodayReservation(Long carWashId) {
+
+        LocalDateTime startDateTime = LocalDateTime.now().with(LocalTime.MIN);  // 오늘 00:00:00
+        LocalDateTime endDateTime = LocalDateTime.now().with(LocalTime.MAX);    // 오늘 23:59:59.999999999
+
+        List<Reservation> reservations = reservationRepository.findByCarWashIdAndStatusAndReservationDateTimeBetweenOrderByReservationDateTime(carWashId, ReservationStatus.CONFIRMED, startDateTime, endDateTime);
+
+        return reservations.stream()
+            .map(reservation -> ReservationResponseDto.builder()
+                .reservationId(reservation.getId())
+                .reservationDateTime(reservation.getReservationDateTime())
+                .carType(reservation.getCarType())
+                .request(reservation.getRequest())
+                .imageUrl(reservation.getImgUrl())
+                .status(reservation.getStatus())
+                .menuName(reservation.getMenu().getMenuName())
+                .build())
+            .collect(Collectors.toList());
+    }
 }
