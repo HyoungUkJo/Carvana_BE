@@ -28,7 +28,7 @@ public class CarWashController {
         return carWashService.registerCarWash(registerCarWashRequestDto);
     }
 
-    @Operation(summary = "세차장메뉴", description = "세차장 메뉴 등록하는 API 세차장이 먼저 등록되어있어야한다.")
+    @Operation(summary = "세차장메뉴 등록", description = "세차장 메뉴 등록하는 API 세차장이 먼저 등록되어있어야한다.")
     @PostMapping("/{carWashId}/register/menues")
     public RegisterCarWashMenuResponseDto registerCarWashMenu(@PathVariable Long carWashId, @RequestBody RegisterCarWashMenuRequestDto registerCarWashMenuRequestDto) {
         return carWashService.registerCarWashMenu(carWashId, registerCarWashMenuRequestDto);
