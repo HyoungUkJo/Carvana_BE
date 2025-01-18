@@ -41,4 +41,20 @@ public class CustomerMember {
         this.carType = carType;
         this.carNumber = carNumber;
     }
+
+    public void updateProfile(CustomerMemberProfileUpdateRequestDto dto) {
+        if (dto.getName() != null){
+            this.name = dto.getName();
+        }
+        if (dto.getPhone() != null){
+            this.phone = dto.getPhone();
+        }
+        if (dto.getCarType() != null){
+            this.carType = dto.getCarType();
+        }
+        if (dto.getCarNumber() != null){
+            this.carNumber = dto.getCarNumber();
+        }
+    }
+
 }
