@@ -27,4 +27,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         LocalDateTime startOfMonth,
         LocalDateTime endOfMonth
     );
+
+
 }

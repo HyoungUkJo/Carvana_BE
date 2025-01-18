@@ -11,13 +11,7 @@ public class SignUpRequestDto {
     private String password;
     private String name;
     private String phone;
+    private String carType;     // 차종
+    private String carNumber;   // 차번호
 
-    @Builder
-    public SignUpRequestDto(String email, String password,
-                            String name, String phone) {
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.phone = phone;
-    }
 }
