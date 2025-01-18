@@ -28,12 +28,16 @@ public class CustomerMemberController {
         return customerMemberService.getMyPage(memberId);
     }
 
-    // 회원탈퇴
     // 내 프로필 수정
     @PostMapping("{memberId}/updateProfile")
     public CustomerMemberProfileResponseDto updateMyProfile(@PathVariable Long memberId, @RequestBody CustomerMemberProfileUpdateRequestDto updateRequestDto){
         return customerMemberService.updateMyProfile(memberId, updateRequestDto);
     }
 
+    // 내 예약 기록
+    @GetMapping("/{memberId}/myReservation")
+    public List<ReservationResponseDto> getMyReservation(@PathVariable Long memberId) {
+        return customerMemberService.getMyReservation(memberId);
+    }
 
 }
