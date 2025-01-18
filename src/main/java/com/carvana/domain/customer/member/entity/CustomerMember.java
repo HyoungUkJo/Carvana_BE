@@ -32,7 +32,10 @@ public class CustomerMember {
     @OneToOne(mappedBy = "customerMember")
     private CustomerAuth customerAuth;
 
-    public CustomerMember(String name, String phone) {
+    @OneToMany(mappedBy = "customerMember")   // Review의 customerMember 필드와 매핑
+    private final List<Review> reviews = new ArrayList<>();
+
+    public CustomerMember(String name, String phone, String carType, String carNumber) {
         this.name = name;
         this.phone = phone;
     }
