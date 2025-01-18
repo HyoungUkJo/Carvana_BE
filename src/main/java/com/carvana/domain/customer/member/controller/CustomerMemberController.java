@@ -29,5 +29,11 @@ public class CustomerMemberController {
     }
 
     // 회원탈퇴
+    // 내 프로필 수정
+    @PostMapping("{memberId}/updateProfile")
+    public CustomerMemberProfileResponseDto updateMyProfile(@PathVariable Long memberId, @RequestBody CustomerMemberProfileUpdateRequestDto updateRequestDto){
+        return customerMemberService.updateMyProfile(memberId, updateRequestDto);
+    }
+
 
 }
