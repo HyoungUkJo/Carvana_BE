@@ -24,13 +24,12 @@ public class CustomerReservationController {
 
     // 예약 가능일지 요청
     @Operation(summary = "해당 일자에 예약이 가능한지 확인", description = "예약 월 일을 선택하면 예약 가능한 시간은 return 해주는 api")
-    @GetMapping("/{carWashId}/availableReservation")
+    @GetMapping("/{carWashId}/availableTime")
     public DailyScheduleResponseDto getAvailableTime(@PathVariable Long carWashId,
                                                        @RequestParam LocalDate date) {
         return reservationService.getAvailableReservation(carWashId, date);
 
     }
-
 
 
     // 예약 요청
