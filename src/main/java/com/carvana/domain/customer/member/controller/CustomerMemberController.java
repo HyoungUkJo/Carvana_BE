@@ -22,7 +22,11 @@ public class CustomerMemberController {
         return customerMemberService.getMyProfile(memberId);
     }
 
-    // 로그아웃
+    // 마이페이지
+    @GetMapping("/{memberId}/myPage")
+    public CustomerMyPageResponseDto getMyPage(@PathVariable Long memberId) {
+        return customerMemberService.getMyPage(memberId);
+    }
 
     // 회원탈퇴
 
