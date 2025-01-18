@@ -38,5 +38,7 @@ public class CustomerMember {
     public CustomerMember(String name, String phone, String carType, String carNumber) {
         this.name = name;
         this.phone = phone;
+        this.carType = carType;
+        this.carNumber = carNumber;
     }
 }
