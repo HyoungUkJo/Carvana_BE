@@ -34,7 +34,7 @@ public class CustomerAuthService {
         // validatePassword()
 
         // 멤버 엔티티 생성
-        CustomerMember customerMember = new CustomerMember(signUpRequest.getName(), signUpRequest.getPhone());
+        CustomerMember customerMember = new CustomerMember(signUpRequest.getName(), signUpRequest.getPhone(),signUpRequest.getCarType(), signUpRequest.getCarNumber());
         customerMemberRepository.save(customerMember);
 
         // auth 엔티티 생성 저장 -> 인증 토큰 관리 -> 추후 레디스로
