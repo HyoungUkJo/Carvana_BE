@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /*
 * Todo: 고민해야할 사항
@@ -21,19 +22,21 @@ public class ReservationResponseDto {
     private String request;
     private String imageUrl;
     private String carType;
+    private String carNumber;   //  차번호
     private ReservationStatus status;
-    private String menuName;       // 예약한 메뉴
+    private List<String> menuList;       // 예약한 메뉴
 
     @Builder
     public ReservationResponseDto(Long reservationId, LocalDateTime reservationDateTime,
-                                  String request, String imageUrl, String carType,
-                                  ReservationStatus status, String menuName) {
+                                  String request, String imageUrl, String carType, String carNumber,
+                                  ReservationStatus status, List<String> menuList) {
         this.reservationId = reservationId;
         this.reservationDateTime = reservationDateTime;
         this.request = request;
         this.imageUrl = imageUrl;
         this.carType = carType;
+        this.carNumber = carNumber;
         this.status = status;
-        this.menuName = menuName;
+        this.menuList = menuList;
     }
 }
