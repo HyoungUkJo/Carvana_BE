@@ -140,6 +140,7 @@ public class ReservationService {
             .carWash(carWash)
             .menu(carWashMenu)
             .carType(request.getCarType())
+            .carNumber(request.getCarNumber())
             .reservationDateTime(request.getReservationDateTime())
             .request(request.getRequest())
             .createAt(LocalDateTime.now())
@@ -161,6 +162,7 @@ public class ReservationService {
             .request(savedReservation.getRequest())
             .imageUrl(savedReservation.getImgUrl())
             .carType(savedReservation.getCarType())
+            .carNumber(reservation.getCarNumber())
             .status(savedReservation.getStatus())
             .build();
     }
@@ -169,6 +171,7 @@ public class ReservationService {
     public List<ReservationResponseDto> requestedPendingReservation(Long carWashId) {
         List<Reservation> reservationList = reservationRepository.findByCarWashIdAndStatusOrderByCreateAtDesc(carWashId, ReservationStatus.PENDING);
 
+
         return reservationList.stream()
             .map(reservation -> ReservationResponseDto.builder()
                 .reservationId(reservation.getId())
@@ -176,6 +179,7 @@ public class ReservationService {
                 .request(reservation.getRequest())
                 .imageUrl(reservation.getImgUrl())
                 .carType(reservation.getCarType())
+                .carNumber(reservation.getCarNumber())
                 .status(reservation.getStatus())
                 .menuName(reservation.getMenu().getMenuName())
                 .build()).collect(Collectors.toList());
@@ -231,6 +235,7 @@ public class ReservationService {
                 .reservationId(reservation.getId())
                 .reservationDateTime(reservation.getReservationDateTime())
                 .carType(reservation.getCarType())
+                .carNumber(reservation.getCarNumber())
                 .request(reservation.getRequest())
                 .imageUrl(reservation.getImgUrl())
                 .status(reservation.getStatus())
@@ -249,6 +254,7 @@ public class ReservationService {
                 .reservationId(reservation.getId())
                 .reservationDateTime(reservation.getReservationDateTime())
                 .carType(reservation.getCarType())
+                .carNumber(reservation.getCarNumber())
                 .request(reservation.getRequest())
                 .imageUrl(reservation.getImgUrl())
                 .status(reservation.getStatus())
@@ -270,6 +276,7 @@ public class ReservationService {
                 .reservationId(reservation.getId())
                 .reservationDateTime(reservation.getReservationDateTime())
                 .carType(reservation.getCarType())
+                .carNumber(reservation.getCarNumber())
                 .request(reservation.getRequest())
                 .imageUrl(reservation.getImgUrl())
                 .status(reservation.getStatus())
