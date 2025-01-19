@@ -107,7 +107,7 @@ public class ReservationService {
         return bayReservations.stream()
             .noneMatch(reservation -> {
                 LocalDateTime reservationStart = reservation.getReservationDateTime();
-                LocalDateTime reservationEnd = reservationStart.plusMinutes(reservation.getMenu().getDuration());
+                LocalDateTime reservationEnd = reservationStart.plusMinutes(reservation.calculateTotalDuration());
                 return !slotDateTime.isBefore(reservationStart) && slotDateTime.isBefore(reservationEnd);
             });
     }
@@ -124,8 +124,8 @@ public class ReservationService {
         CarWash carWash = carWashRepository.findById(request.getCarWashId())
             .orElseThrow(() -> new EntityNotFoundException("세차장을 찾을 수 없습니다."));
 
-        CarWashMenu carWashMenu = carWashMenuRepository.findById(request.getMenuId())
-            .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다."));
+//        CarWashMenu carWashMenu = carWashMenuRepository.findById(request.getMenuId())
+//            .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다."));
 
         // 예약 가능 검증
         // 베이정보 및 영업시간 및 예약이 없는지 여부
@@ -138,7 +138,6 @@ public class ReservationService {
         Reservation reservation = Reservation.builder()
             .customerMember(customerMember)
             .carWash(carWash)
-            .menu(carWashMenu)
             .carType(request.getCarType())
             .carNumber(request.getCarNumber())
             .reservationDateTime(request.getReservationDateTime())
@@ -147,6 +146,13 @@ public class ReservationService {
             .bayNumber(request.getBayNumber())
 //            .imgUrl(imageUrl)
             .build();
+
+        // 선택한 메뉴들을 예약에 추가
+        for(Long menuId : request.getMenuIds()) {
+            CarWashMenu menu = carWashMenuRepository.findById(menuId)
+                .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다."));
+            reservation.addMenu(menu);
+        }
 
         // 저장
         Reservation savedReservation = reservationRepository.save(reservation);
@@ -181,7 +187,7 @@ public class ReservationService {
                 .carType(reservation.getCarType())
                 .carNumber(reservation.getCarNumber())
                 .status(reservation.getStatus())
-                .menuName(reservation.getMenu().getMenuName())
+                .menuList(reservation.getMenuNameList())
                 .build()).collect(Collectors.toList());
     }
 
@@ -202,7 +208,7 @@ public class ReservationService {
         return MonthlyStatsDto.builder()
             .totalReservation(completedReservations.size())
             .totalRevenue(completedReservations.stream()
-                .mapToInt(revenue->revenue.getMenu().getPrice())
+                .mapToInt(revenue->revenue.calculateTotalPrice())
                 .sum())
             .totalReviews(reviewCount)
             .build();
@@ -239,7 +245,7 @@ public class ReservationService {
                 .request(reservation.getRequest())
                 .imageUrl(reservation.getImgUrl())
                 .status(reservation.getStatus())
-                .menuName(reservation.getMenu().getMenuName())
+                .menuList(reservation.getMenuNameList())
                 .build()).collect(Collectors.toList());
     }
 
@@ -258,7 +264,7 @@ public class ReservationService {
                 .request(reservation.getRequest())
                 .imageUrl(reservation.getImgUrl())
                 .status(reservation.getStatus())
-                .menuName(reservation.getMenu().getMenuName())
+                .menuList(reservation.getMenuNameList())
                 .build())
             .collect(Collectors.toList());
     }
@@ -280,7 +286,7 @@ public class ReservationService {
                 .request(reservation.getRequest())
                 .imageUrl(reservation.getImgUrl())
                 .status(reservation.getStatus())
-                .menuName(reservation.getMenu().getMenuName())
+                .menuList(reservation.getMenuNameList())
                 .build())
             .collect(Collectors.toList());
     }
