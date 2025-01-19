@@ -65,7 +65,7 @@ public class CustomerFcmService {
                 .setTitle("새로운 예약 요청")
                 .setBody(String.format("%s님이 %s 메뉴를 예약 했습니다.",
                     reservation.getCustomerMember().getName(),
-                    reservation.getMenu().getMenuName()))
+                    reservation.getMenuNameList()))
                 .build())
             .build();
 

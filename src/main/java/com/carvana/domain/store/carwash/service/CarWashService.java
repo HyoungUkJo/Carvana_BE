@@ -127,7 +127,7 @@ public class CarWashService {
         return CarWashMonthlyStatsDto.builder()
             .totalWorkload(reservations.size())
             .totalRevenue(reservations.stream()
-                .mapToInt(revenue -> revenue.getMenu().getPrice())
+                .mapToInt(revenue -> revenue.calculateTotalPrice())
                 .sum())
             .totalReviews(reviewCount)
             .targetWorkload(carWashBusinessTarget.getMonthlyWorkloadTarget())

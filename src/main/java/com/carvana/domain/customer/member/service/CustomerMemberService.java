@@ -72,7 +72,7 @@ public class CustomerMemberService {
                 .imageUrl(reservation.getImgUrl())
                 .carType(reservation.getCarType())
                 .status(reservation.getStatus())
-                .menuName(reservation.getMenu().getMenuName())
+                .menuList(reservation.getMenuNameList())
                 .build()).toList();
 
     }
@@ -92,7 +92,7 @@ public class CustomerMemberService {
                 .imageUrl(reservation.getImgUrl())
                 .carType(reservation.getCarType())
                 .status(reservation.getStatus())
-                .menuName(reservation.getMenu().getMenuName())
+                .menuList(reservation.getMenuNameList())
                 .build()).toList();
 
         List<ReviewResponseDto> reviews = customerMember.getReviews().stream()
