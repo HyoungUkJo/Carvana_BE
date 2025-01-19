@@ -1,9 +1,13 @@
 package com.carvana.domain.store.carwash.entity;
 
+import com.carvana.domain.reservation.entity.ReservationMenu;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -16,6 +20,9 @@ public class CarWashMenu {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carwash_id")
     private CarWash carWash;
+
+    @OneToMany(mappedBy = "carWashMenu")
+    private final List<ReservationMenu> reservationMenus = new ArrayList<>();   // 선택된 예약과의 관계 설정
 
     private String menuName;        //메뉴 이름
     private String menuDescription; // 메뉴 설명
