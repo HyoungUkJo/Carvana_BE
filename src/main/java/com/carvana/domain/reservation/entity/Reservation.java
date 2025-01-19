@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -33,11 +35,12 @@ public class Reservation {
     @JoinColumn(name = "carwash_id")
     private CarWash carWash;            // 세차장 엔티티
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id")
-    private CarWashMenu menu;           // 세차 메뉴 엔티티
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)   // 연쇄 반응 설정 cascade, orphanremoval
+    private final List<ReservationMenu> reservationMenus = new ArrayList<>();       // 선택한 세차 메뉴
 
     private String carType;             // 세차할 차종
+
+    private String carNumber;           // 세차할 차번호
 
     private LocalDateTime reservationDateTime;  // 예약 시간
 
@@ -58,8 +61,8 @@ public class Reservation {
     public Reservation(Long id,
                        CustomerMember customerMember,
                        CarWash carWash,
-                       CarWashMenu menu,
                        String carType,
+                       String carNumber,
                        LocalDateTime reservationDateTime,
                        String request,
                        String imgUrl,
@@ -69,8 +72,8 @@ public class Reservation {
         this.id = id;
         this.customerMember = customerMember;
         this.carWash = carWash;
-        this.menu = menu;
         this.carType = carType;
+        this.carNumber = carNumber;
         this.reservationDateTime = reservationDateTime;
         this.request = request;
         this.imgUrl = imgUrl;
@@ -82,4 +85,33 @@ public class Reservation {
         this.status = requestDto.getStatus();
         this.rejectReason = requestDto.getRejectReason();
     }
+
+    // 예약 메뉴 추가 메서드
+    public void addMenu(CarWashMenu carWashMenu) {
+        ReservationMenu reservationMenu = ReservationMenu.builder()
+            .reservation(this)
+            .carWashMenu(carWashMenu)
+            .build();
+        this.reservationMenus.add(reservationMenu);
+    }
+
+    // 세차 가격 계산 메서드
+    public int calculateTotalPrice() {
+        return reservationMenus.stream()
+            .mapToInt(reservationMenus -> reservationMenus.getCarWashMenu().getPrice()).sum();
+    }
+
+    // 세차 소요 시간 계산 메서드
+    public int calculateTotalDuration() {
+        return reservationMenus.stream()
+            .mapToInt(reservationMenus -> reservationMenus.getCarWashMenu().getDuration()).sum();
+    }
+
+    // 선택한 메뉴를 가지고오는 메서드
+    public List<String> getMenuNameList() {
+        return reservationMenus.stream()
+            .map(reservationMenu -> reservationMenu.getCarWashMenu().getMenuName())
+            .toList();
+    }
+
 }
