@@ -55,4 +55,11 @@ public class CarWashController {
         return carWashService.getMonthlyStats(carWashId);
     }
 
+    // 업체 상세 정보
+    @Operation(summary = "업체 상세", description = "업체 정보 및 메뉴리스트")
+    @GetMapping("/{carWashId}/store")
+    public CarWashInfoResponseDto getCarWashInfo(@PathVariable Long carWashId) {
+        return carWashService.getCarWashInfo(carWashId);
+    }
+
 }
