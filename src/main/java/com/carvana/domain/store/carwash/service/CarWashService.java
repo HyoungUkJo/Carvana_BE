@@ -150,4 +150,24 @@ public class CarWashService {
             .build());
     }
 
+    // 업체 상세 정보 (업체정보, 메뉴 등)
+    public CarWashInfoResponseDto getCarWashInfo(Long carWashId) {
+        CarWash carWash = carWashRepository.findById(carWashId).orElseThrow(() -> new EntityNotFoundException("해당하는 세차장이 없습니다."));
+
+        List<CarWashMenuDto> carWashMenuDtoList = carWash.getMenus().stream()
+            .map(CarWashMenuDto::new)
+            .toList();
+
+        return CarWashInfoResponseDto.builder()
+            .id(carWash.getId())
+            .name(carWash.getName())
+            .address(carWash.getAddress())
+            .phone(carWash.getPhone())
+            .businessHours(carWash.getBusinessHours())
+            .bayCount(carWash.getBayCount())
+            .thumbnailImgUrl(carWash.getThumbnailImgUrl())
+            .carWashMenus(carWashMenuDtoList)
+            .build();
+    }
+
 }
