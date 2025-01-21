@@ -3,6 +3,7 @@ package com.carvana.domain.reservation.dto;
 import com.carvana.domain.reservation.entity.ReservationStatus;
 import com.carvana.domain.store.carwash.entity.CarWash;
 import com.carvana.domain.store.carwash.entity.CarWashMenu;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ReservationResponseDto {
     private Long reservationId;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime reservationDateTime;
     private String request;
     private String imageUrl;
