@@ -91,8 +91,10 @@ public class CustomerMemberService {
                 .request(reservation.getRequest())
                 .imageUrl(reservation.getImgUrl())
                 .carType(reservation.getCarType())
+                .carNumber(reservation.getCarNumber())
                 .status(reservation.getStatus())
                 .menuList(reservation.getMenuNameList())
+                .bayNumber(reservation.getBayNumber())
                 .build()).toList();
 
         List<ReviewResponseDto> reviews = customerMember.getReviews().stream()
