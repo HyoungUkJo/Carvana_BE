@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)  // 한 테이블에 모든 자식 클래스 데이터를 저장
 @DiscriminatorColumn(name = "notification_type")  // 구분 컬럼
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SuperBuilder
 public abstract class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,17 +32,19 @@ public abstract class Notification {
 
     private LocalDateTime createdAt;    // 생성일자
 
-    public Notification(CustomerMember customerMember,
-                        String title,
-                        String message,
-                        boolean isRead,
-                        LocalDateTime createdAt) {
+    public Notification(CustomerMember customerMember, String title, String message) {
         this.customerMember = customerMember;
         this.title = title;
         this.message = message;
-        this.isRead = isRead;
-        this.createdAt = createdAt;
+        this.isRead = false;
+        this.createdAt = LocalDateTime.now();
     }
+
+    // 메시지를 수정하는 메서드
+    public void updateMessage(String message) {
+        this.message = message;
+    }
+
 
     public boolean isRead() {
         return isRead;
