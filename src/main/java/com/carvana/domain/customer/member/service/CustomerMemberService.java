@@ -3,6 +3,7 @@ package com.carvana.domain.customer.member.service;
 import com.carvana.domain.customer.member.dto.CustomerMemberProfileResponseDto;
 import com.carvana.domain.customer.member.dto.CustomerMemberProfileUpdateRequestDto;
 import com.carvana.domain.customer.member.dto.CustomerMyPageResponseDto;
+import com.carvana.domain.customer.member.dto.MyReservationResponseDto;
 import com.carvana.domain.customer.member.entity.CustomerMember;
 import com.carvana.domain.customer.member.repository.CustomerMemberRepository;
 import com.carvana.domain.reservation.dto.ReservationResponseDto;
@@ -59,13 +60,13 @@ public class CustomerMemberService {
     }
 
     // 내 예약 조회
-    public List<ReservationResponseDto> getMyReservation(Long customerMemberId) {
+    public List<MyReservationResponseDto> getMyReservation(Long customerMemberId) {
         CustomerMember customerMember = customerMemberRepository.findById(customerMemberId).orElseThrow(
             () -> new EntityNotFoundException("해당하는 사용자가 없습니다.")
         );
 
         return customerMember.getReservationList().stream()
-            .map(reservation -> ReservationResponseDto.builder()
+            .map(reservation -> MyReservationResponseDto.builder()
                 .reservationId(reservation.getId())
                 .reservationDateTime(reservation.getReservationDateTime())
                 .request(reservation.getRequest())
@@ -75,6 +76,7 @@ public class CustomerMemberService {
                 .status(reservation.getStatus())
                 .menuList(reservation.getMenuNameList())
                 .bayNumber(reservation.getBayNumber())
+                .storeName(reservation.getCarWash().getName())
                 .build()).toList();
 
     }
