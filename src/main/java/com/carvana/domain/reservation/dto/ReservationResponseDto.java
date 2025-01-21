@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ReservationResponseDto {
     private Long reservationId;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime reservationDateTime;
     private String request;
     private String imageUrl;
