@@ -169,6 +169,7 @@ public class ReservationService {
             .imageUrl(savedReservation.getImgUrl())
             .carType(savedReservation.getCarType())
             .carNumber(reservation.getCarNumber())
+            .bayNumber(reservation.getBayNumber())
             .status(savedReservation.getStatus())
             .build();
     }
@@ -187,6 +188,7 @@ public class ReservationService {
                 .carType(reservation.getCarType())
                 .carNumber(reservation.getCarNumber())
                 .status(reservation.getStatus())
+                .bayNumber(reservation.getBayNumber())
                 .menuList(reservation.getMenuNameList())
                 .build()).collect(Collectors.toList());
     }
@@ -245,6 +247,7 @@ public class ReservationService {
                 .request(reservation.getRequest())
                 .imageUrl(reservation.getImgUrl())
                 .status(reservation.getStatus())
+                .bayNumber(reservation.getBayNumber())
                 .menuList(reservation.getMenuNameList())
                 .build()).collect(Collectors.toList());
     }
@@ -264,6 +267,7 @@ public class ReservationService {
                 .request(reservation.getRequest())
                 .imageUrl(reservation.getImgUrl())
                 .status(reservation.getStatus())
+                .bayNumber(reservation.getBayNumber())
                 .menuList(reservation.getMenuNameList())
                 .build())
             .collect(Collectors.toList());
@@ -286,6 +290,7 @@ public class ReservationService {
                 .request(reservation.getRequest())
                 .imageUrl(reservation.getImgUrl())
                 .status(reservation.getStatus())
+                .bayNumber(reservation.getBayNumber())
                 .menuList(reservation.getMenuNameList())
                 .build())
             .collect(Collectors.toList());
