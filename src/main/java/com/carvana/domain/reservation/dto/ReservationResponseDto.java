@@ -25,12 +25,12 @@ public class ReservationResponseDto {
     private String carNumber;   //  차번호
     private ReservationStatus status;
     private List<String> menuList;       // 예약한 메뉴
-    private int bayNumber;              // 예약한 베이 번호
+    private Integer bayNumber;              // 예약한 베이 번호
 
     @Builder
     public ReservationResponseDto(Long reservationId, LocalDateTime reservationDateTime,
                                   String request, String imageUrl, String carType, String carNumber,
-                                  ReservationStatus status, List<String> menuList, int bayNumber) {
+                                  ReservationStatus status, List<String> menuList, Integer bayNumber) {
         this.reservationId = reservationId;
         this.reservationDateTime = reservationDateTime;
         this.request = request;
