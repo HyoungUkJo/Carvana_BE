@@ -12,6 +12,7 @@ import com.carvana.domain.store.carwash.entity.CarWashMenu;
 import com.carvana.domain.store.carwash.repository.CarWashMenuRepository;
 import com.carvana.domain.store.carwash.repository.CarWashRepository;
 import com.carvana.global.notification.service.FcmService;
+import com.carvana.global.notification.service.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,9 @@ public class ReservationService {
 
     // 임시로 FcmTokenService 의존성 주입해서 push 보내기
     private final FcmService fcmService;
+
+    // 예약 notification 의존성 추가
+    private final NotificationService notificationService;
 
     // 예약 가능한 일자 확인
     public DailyScheduleResponseDto getAvailableReservation(Long carWashId, LocalDate date) {
@@ -160,6 +164,8 @@ public class ReservationService {
         // 임시로 push를 예약 서비스에서 호출 -> 추후 이벤트 헨들러로 처리
         fcmService.sendNewReservationNotification(reservation.getCarWash().getOwnerMember().getId(), reservation);
 
+        // 예약 요청 알림
+        notificationService.createReservationNotification(customerMember,reservation);
 
         // 결과
         return ReservationResponseDto.builder()
@@ -223,6 +229,9 @@ public class ReservationService {
             .orElseThrow(() -> new EntityNotFoundException("예약을 찾을 수 없습니다."));
 
         reservation.updateStatus(requestDto);
+
+        // 예약 요청 알림
+        notificationService.createReservationNotification(reservation.getCustomerMember(),reservation);
 
 
         return ReservationUpdateResponseDto.builder()
