@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -245,8 +246,9 @@ public class ReservationService {
     public List<ReservationResponseDto> getMonthlyReservation(Long carWashId, int year, int month) {
         LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);
         LocalDateTime end = start.plusMonths(1).minusNanos(1);
-        List<Reservation> reservations = reservationRepository.findByCarWashIdAndReservationDateTimeBetweenOrderByReservationDateTime(carWashId, start, end);
-
+        List<ReservationStatus> targetStatus = Arrays.asList(ReservationStatus.PENDING, ReservationStatus.COMPLETED, ReservationStatus.CONFIRMED);
+        // List<Reservation> reservations = reservationRepository.findByCarWashIdAndReservationDateTimeBetweenOrderByReservationDateTime(carWashId, start, end);
+        List<Reservation> reservations = reservationRepository.findByCarWashIdAndReservationDateTimeBetweenAndStatusIn(carWashId, start, end, targetStatus);
         return reservations.stream()
             .map(reservation -> ReservationResponseDto.builder()
                 .reservationId(reservation.getId())
