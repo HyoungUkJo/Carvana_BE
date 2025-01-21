@@ -14,7 +14,7 @@ public class ReservationUpdateRequestDto {
         "    CONFIRMED,  // 예약 확정\n" +
         "    CANCELLED,  // 예약 취소\n" +
         "    COMPLETED   // 서비스 완료]",
-    example = "CONFIREMED | DENIED")
+    example = "CONFIRMED | DENIED")
     private ReservationStatus status;
 
     @Schema(description = "예약 거절 사유 (수락시 null로 전송)")
