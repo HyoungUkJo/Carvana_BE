@@ -13,7 +13,7 @@ public class CarWashBusinessTarget {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="carwash")
+    @JoinColumn(name="carwash_id")
     private CarWash carWash;
 
     private Integer monthlyReviewTarget;
