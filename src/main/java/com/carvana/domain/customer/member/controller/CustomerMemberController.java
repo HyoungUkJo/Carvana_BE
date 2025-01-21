@@ -3,6 +3,7 @@ package com.carvana.domain.customer.member.controller;
 import com.carvana.domain.customer.member.dto.CustomerMemberProfileResponseDto;
 import com.carvana.domain.customer.member.dto.CustomerMemberProfileUpdateRequestDto;
 import com.carvana.domain.customer.member.dto.CustomerMyPageResponseDto;
+import com.carvana.domain.customer.member.dto.MyReservationResponseDto;
 import com.carvana.domain.customer.member.service.CustomerMemberService;
 import com.carvana.domain.reservation.dto.ReservationResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class CustomerMemberController {
 
     // 내 예약 기록
     @GetMapping("/{memberId}/myReservation")
-    public List<ReservationResponseDto> getMyReservation(@PathVariable Long memberId) {
+    public List<MyReservationResponseDto> getMyReservation(@PathVariable Long memberId) {
         return customerMemberService.getMyReservation(memberId);
     }
 
