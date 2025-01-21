@@ -5,6 +5,7 @@ import com.carvana.domain.customer.member.repository.CustomerMemberRepository;
 import com.carvana.domain.reservation.entity.Reservation;
 import com.carvana.global.exception.custom.FCMException;
 import com.carvana.global.notification.entity.CustomerFcmToken;
+import com.carvana.global.notification.entity.ReservationNotification;
 import com.carvana.global.notification.repository.CustomerFcmTokenRepository;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -55,17 +56,15 @@ public class CustomerFcmService {
     }
 
     // 알림 보내기
-    public void sendNewReservationNotification(Long customerId, Reservation reservation) {
+    public void sendReservationNotification(Long customerId, ReservationNotification notification) {
         CustomerFcmToken customerFcmToken = customerFcmTokenRepository.findByCustomerMemberId(customerId)
             .orElseThrow(() -> new IllegalStateException("FCM토큰이 없습니다."));
 
         Message message = Message.builder()
             .setToken(customerFcmToken.getToken())
             .setNotification(Notification.builder()
-                .setTitle("새로운 예약 요청")
-                .setBody(String.format("%s님이 %s 메뉴를 예약 했습니다.",
-                    reservation.getCustomerMember().getName(),
-                    reservation.getMenuNameList()))
+                .setTitle(notification.getTitle())
+                .setBody(notification.getMessage())
                 .build())
             .build();
 
