@@ -55,7 +55,7 @@ public class CustomerFcmService {
         }
     }
 
-    // 알림 보내기
+    // 예약 알림 보내기
     public void sendReservationNotification(Long customerId, ReservationNotification notification) {
         CustomerFcmToken customerFcmToken = customerFcmTokenRepository.findByCustomerMemberId(customerId)
             .orElseThrow(() -> new IllegalStateException("FCM토큰이 없습니다."));
@@ -66,6 +66,10 @@ public class CustomerFcmService {
                 .setTitle(notification.getTitle())
                 .setBody(notification.getMessage())
                 .build())
+            // push 페이로드 추가
+            .putData("type", "RESERVATION_STATUS")
+            .putData("reservationId",notification.getReservation().getId().toString())
+            .putData("screen", "MY_RESERVATION_DETAIL")
             .build();
 
         try {
