@@ -36,5 +36,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         List<ReservationStatus> statuses
     );
 
+    // 특정 베이의 특정 상태의 예약 조회
+    List<Reservation> findByCarWashIdAndStatusAndBayNumberAndReservationDateTimeBetweenOrderByReservationDateTime(
+        Long carWashId,
+        ReservationStatus status,
+        Integer bayNumber,
+        LocalDateTime startDateTime,
+        LocalDateTime endDateTime
+    );
+
 
 }
