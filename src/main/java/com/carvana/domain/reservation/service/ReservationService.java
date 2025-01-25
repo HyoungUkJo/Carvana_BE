@@ -11,10 +11,12 @@ import com.carvana.domain.store.carwash.entity.CarWash;
 import com.carvana.domain.store.carwash.entity.CarWashMenu;
 import com.carvana.domain.store.carwash.repository.CarWashMenuRepository;
 import com.carvana.domain.store.carwash.repository.CarWashRepository;
+import com.carvana.global.exception.custom.ReservationException;
 import com.carvana.global.notification.service.FcmService;
 import com.carvana.global.notification.service.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -118,6 +120,14 @@ public class ReservationService {
     }
 
 
+    // 두 시간 구간의 겹침 확인
+    private boolean isTimeOverlap(
+        LocalDateTime start1, LocalDateTime end1,
+        LocalDateTime start2, LocalDateTime end2
+    ) {
+        return !start1.isAfter(end2) && !start2.isAfter(end1);
+    }
+
     // 예약 생성
     @Transactional
     public ReservationResponseDto createReservation(ReservationRequestDto request) {
@@ -131,9 +141,6 @@ public class ReservationService {
 
 //        CarWashMenu carWashMenu = carWashMenuRepository.findById(request.getMenuId())
 //            .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다."));
-
-        // 예약 가능 검증
-        // 베이정보 및 영업시간 및 예약이 없는지 여부
 
         // 이미지 처리
         // TODO : 이미지 저장 로직 작성
@@ -157,6 +164,36 @@ public class ReservationService {
             CarWashMenu menu = carWashMenuRepository.findById(menuId)
                 .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다."));
             reservation.addMenu(menu);
+        }
+
+        // 베이정보 및 영업시간 및 예약이 없는지 여부
+
+        // 해당 예약의 시작시간부터 끝나는 시간까지의 예약을 조회
+        // 그러나 시작 시간 전에 예약이 있고 그 예약이 지금 들어오는 예약시간을 사용하고 있다면 어떻게 처리해야할지..?
+        // 일단은 그럼 아예 단순하게 해당 일자의 예약을 전체 조회를 하고 들어온 예약을 비교하는 쿼리를 작성...
+
+        LocalDateTime requestReservationStart = reservation.getReservationDateTime();
+        // 세차 완료시간 계산
+        LocalDateTime requestReservationEnd = reservation.getReservationDateTime().plusMinutes(reservation.calculateTotalDuration());
+        // 예약 요청 일자의 예약을 전체 조회
+        LocalDateTime startOfDay = request.getReservationDateTime().toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.toLocalDate().atTime(LocalTime.MAX);
+
+        List<Reservation> reservations = reservationRepository.findByCarWashIdAndStatusAndBayNumberAndReservationDateTimeBetweenOrderByReservationDateTime(
+            request.getCarWashId(),
+            ReservationStatus.CONFIRMED,
+            reservation.getBayNumber(),
+            startOfDay,
+            endOfDay);
+
+        for (Reservation existingReservation : reservations) {
+            LocalDateTime existingStart = existingReservation.getReservationDateTime();
+            LocalDateTime existingEnd = existingStart.plusMinutes(existingReservation.calculateTotalDuration());
+
+            if (isTimeOverlap(requestReservationStart,requestReservationEnd,existingStart,existingEnd)) {
+                throw new ReservationException("해당 시간에 이미 예약이 존재합니다.");
+            }
+
         }
 
         // 저장
