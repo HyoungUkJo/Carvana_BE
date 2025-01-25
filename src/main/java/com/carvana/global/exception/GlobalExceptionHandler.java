@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
             .body(new ErrorResponseDto("INCORRECT EMAIL OR PASSWORD", e.getMessage()));
     }
     @ExceptionHandler(ReservationException.class)
-    public ResponseEntity<ErrorResponseDto> ReservationException(IncorrectEmailPasswordException e) {
+    public ResponseEntity<ErrorResponseDto> ReservationException(ReservationException e) {
         return ResponseEntity
             .status(HttpStatus.CONFLICT)
             .body(new ErrorResponseDto("RESERVATION EXCEPTION", e.getMessage()));
