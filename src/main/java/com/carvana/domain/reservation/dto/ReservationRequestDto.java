@@ -1,9 +1,10 @@
 package com.carvana.domain.reservation.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -11,14 +12,33 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Schema(description = "예약 요청 DTO")
+@Setter
 public class ReservationRequestDto {
-    private Long customerMemberID;      // 예약자 정보 -> Todo: 추후 토큰으로 대체
-    private Long carWashId;             // 세차장 아이디
-    private String carType;             // 차종
-    private String carNumber;           // 차번호
-    private List<Long> menuIds;         // 선택한 메뉴 아이디
-    private LocalDateTime reservationDateTime;  // 예약일자
-    private String request;             //  요청사항
-    private Integer bayNumber;          // 예약할 베이 번호
-//    private MultipartFile requestImg;   // 사진첨부
+    @Schema(description = "예약자 ID")
+    private Long customerMemberID;
+
+    @Schema(description = "세차장 ID")
+    private Long carWashId;
+
+    @Schema(description = "차종")
+    private String carType;
+
+    @Schema(description = "차량 번호")
+    private String carNumber;
+
+    @Schema(description = "선택한 메뉴 ID 목록")
+    private List<Long> menuIds;
+
+    @Schema(description = "예약 일시")
+    private LocalDateTime reservationDateTime;
+
+    @Schema(description = "요청사항")
+    private String request;
+
+    @Schema(description = "베이 번호")
+    private Integer bayNumber;
+
+    @Schema(description = "차량 이미지 파일들 (선택사항)")
+    private List<MultipartFile> images;
 }

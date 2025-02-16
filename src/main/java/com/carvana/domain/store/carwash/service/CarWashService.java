@@ -15,6 +15,8 @@ import com.carvana.domain.store.carwash.repository.CarWashBusinessTargetReposito
 import com.carvana.domain.store.carwash.repository.CarWashMenuRepository;
 import com.carvana.domain.store.carwash.repository.CarWashRepository;
 import com.carvana.global.exception.custom.IncorrectEmailPasswordException;
+import com.carvana.global.storage.service.PresignedUrlService;
+import com.carvana.global.storage.service.StorageService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -34,27 +37,43 @@ public class CarWashService {
     private final CarWashBusinessTargetRepository carWashBusinessTargetRepository;
     private final ReservationRepository reservationRepository;
     private final ReviewRepository reviewRepository;
+    private final PresignedUrlService presignedUrlService;
+    private final StorageService storageService;
 
     public RegisterCarWashResponseDto registerCarWash(RegisterCarWashRequestDto registerCarWashRequestDto) {
         // 실제 오너가 있는지 검증
-        OwnerMember ownerMember = ownerMemberRepository.findById(registerCarWashRequestDto.getOwnerId()).orElseThrow(() -> new IncorrectEmailPasswordException("아이디 또는 비밀번호가 틀립니다."));
+        OwnerMember ownerMember = ownerMemberRepository.findById(registerCarWashRequestDto.getOwnerId())
+            .orElseThrow(() -> new IncorrectEmailPasswordException("아이디 또는 비밀번호가 틀립니다."));
+
+        // uuid 생성
+        String carWashUUID = UUID.randomUUID().toString();
+
+        // 사진 등록
+        String thumbnailKey = storageService.uploadFile(registerCarWashRequestDto.getThumbnailImg(), "carwash_thumbnail", carWashUUID);
+
         // 추후 중복되는 주소 또는 번호로 검증해야할듯?
         CarWash carWash = CarWash.builder()
             .name(registerCarWashRequestDto.getName())
             .phone(registerCarWashRequestDto.getPhone())
             .address(registerCarWashRequestDto.getAddress())
             .businessHours(registerCarWashRequestDto.getBusinessHours())
-            .thumbnailImgUrl(registerCarWashRequestDto.getThumbnailImgUrl())
+            .thumbnailImgKey(thumbnailKey)
             .build();
 
         ownerMember.addCarWash(carWash);
         carWashRepository.save(carWash);
 
-        // 이거 빌더 패턴으로 할지 다시 생각해볼 필요 있음
-        RegisterCarWashResponseDto registerCarWashResponseDto = new RegisterCarWashResponseDto();
-        registerCarWashResponseDto.setCarWashId(carWash.getId());
-
-        return registerCarWashResponseDto;
+        return RegisterCarWashResponseDto.builder()
+            .carWashId(carWash.getId())
+            .uuid(carWash.getUuid())
+            .address(carWash.getAddress())
+            .phone(carWash.getPhone())
+            .businessHours(carWash.getBusinessHours())
+            .bayCount(carWash.getBayCount())
+            .thumbnailImgUrl(
+                presignedUrlService.generatePresignedUrl(carWash.getThumbnailImgKey(),60)
+            )
+            .build();
     }
     public RegisterCarWashMenuResponseDto registerCarWashMenu(Long carWashId, RegisterCarWashMenuRequestDto registerCarWashMenuRequestDto) {
         // 검증 방법 추후 필요.
@@ -158,6 +177,7 @@ public class CarWashService {
             .map(CarWashMenuDto::new)
             .toList();
 
+
         return CarWashInfoResponseDto.builder()
             .id(carWash.getId())
             .name(carWash.getName())
@@ -165,7 +185,7 @@ public class CarWashService {
             .phone(carWash.getPhone())
             .businessHours(carWash.getBusinessHours())
             .bayCount(carWash.getBayCount())
-            .thumbnailImgUrl(carWash.getThumbnailImgUrl())
+            .thumbnailImgUrl(presignedUrlService.generatePresignedUrl(carWash.getThumbnailImgKey(), 60))
             .carWashMenus(carWashMenuDtoList)
             .build();
     }

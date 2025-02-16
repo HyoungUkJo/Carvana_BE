@@ -1,4 +1,9 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+      enabled: true
   config:
     import: "classpath:config/secrets.properties"  # secrets.properties를 가져옴
   application:

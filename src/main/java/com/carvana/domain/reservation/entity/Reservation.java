@@ -22,6 +22,8 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String uuid;    // 예약을 식별할 uuid
+
     @ManyToOne(fetch = FetchType.LAZY)  // member가 필요할때만 사용할 수 있도록 Lazy하게 설정
     @JoinColumn(name = "customer_member_id")
     private CustomerMember customerMember;
@@ -46,7 +48,11 @@ public class Reservation {
 
     private String request; // 요청사항
 
-    private String imgUrl;  // 이미지 저장된 Url Todo: S3에 연결 지금은 무료로 연결필요
+    @ElementCollection
+    @CollectionTable(name = "reservation_image_keys",
+        joinColumns = @JoinColumn(name = "reservation_id"))
+    @Column(name = "image_key")
+    private List<String> imageKeys = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status = ReservationStatus.PENDING;
@@ -61,22 +67,24 @@ public class Reservation {
     public Reservation(Long id,
                        CustomerMember customerMember,
                        CarWash carWash,
+                       String uuid,
                        String carType,
                        String carNumber,
                        LocalDateTime reservationDateTime,
                        String request,
-                       String imgUrl,
+                       List<String> imageKeys,
                        LocalDateTime createAt,
                        Integer bayNumber
     ) {
         this.id = id;
         this.customerMember = customerMember;
         this.carWash = carWash;
+        this.uuid = uuid;
         this.carType = carType;
         this.carNumber = carNumber;
         this.reservationDateTime = reservationDateTime;
         this.request = request;
-        this.imgUrl = imgUrl;
+        this.imageKeys = imageKeys;
         this.createAt = createAt;
         this.bayNumber = bayNumber;
     }
