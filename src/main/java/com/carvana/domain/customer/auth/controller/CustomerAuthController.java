@@ -1,15 +1,10 @@
 package com.carvana.domain.customer.auth.controller;
 
-import com.carvana.domain.customer.auth.dto.SignInRequestDto;
-import com.carvana.domain.customer.auth.dto.SignInResponseDto;
-import com.carvana.domain.customer.auth.dto.SignUpResponseDto;
+import com.carvana.domain.customer.auth.dto.*;
 import com.carvana.domain.customer.auth.service.CustomerAuthService;
-import com.carvana.domain.customer.auth.dto.SignUpRequestDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,6 +15,10 @@ public class CustomerAuthController {
     @PostMapping("/signup")
     public SignUpResponseDto signUp(@RequestBody SignUpRequestDto signUpRequestDto) {
         return customerAuthService. signUp(signUpRequestDto);
+    }
+    @PostMapping("/email-exists")
+    public EmailCheckResponseDto checkEmailDuplicate(@RequestBody @Valid EmailCheckRequestDto emailCheckRequestDto) {
+        return customerAuthService.checkEmailDuplicate(emailCheckRequestDto.getEmail());
     }
 
     @PostMapping("/signin")

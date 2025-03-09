@@ -1,9 +1,6 @@
 package com.carvana.domain.customer.auth.service;
 
-import com.carvana.domain.customer.auth.dto.SignInRequestDto;
-import com.carvana.domain.customer.auth.dto.SignInResponseDto;
-import com.carvana.domain.customer.auth.dto.SignUpResponseDto;
-import com.carvana.domain.customer.auth.dto.SignUpRequestDto;
+import com.carvana.domain.customer.auth.dto.*;
 import com.carvana.domain.customer.auth.entity.CustomerAuth;
 import com.carvana.domain.customer.auth.repository.CustomerAuthRepository;
 import com.carvana.domain.customer.member.entity.CustomerMember;
@@ -67,5 +64,11 @@ public class CustomerAuthService {
         CustomerMember customerMember = customerAuth.getCustomerMember();
         // 성공여부 리턴 추후 Jwt 리턴
         return SignInResponseDto.builder().name(customerMember.getName()).build();
+    }
+
+    public EmailCheckResponseDto checkEmailDuplicate(String email) {
+        boolean exists = customerAuthRepository.existsByEmail(email);
+
+        return new EmailCheckResponseDto(exists);
     }
 }

@@ -37,22 +37,8 @@ public class CustomerReservationController {
 
     // 예약 요청
     @Operation(summary = "예약 생성", description = "차량 이미지와 함께 새로운 예약을 생성합니다")
-    @PostMapping(value = "/reserve", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ReservationResponseDto createReservation(
-        @ModelAttribute ReservationRequestDto requestDto,
-        @RequestPart(value = "images", required = false) List<MultipartFile> images
-    ) {
-        // 디버깅용
-        System.out.println("=== Request received ===");
-        if (requestDto.getImages() == null) {
-            System.out.println("Images is null");
-            throw new ReservationException("이미지가 넘어오지 않았음");
-        } else {
-            System.out.println("Images size: " + requestDto.getImages().size());
-            requestDto.getImages().forEach(image ->
-                System.out.println("Image name: " + image.getOriginalFilename() + ", size: " + image.getSize())
-            );
-        }
+    @PostMapping(value = "/createReservation", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ReservationResponseDto createReservation(@ModelAttribute ReservationRequestDto requestDto) {
         return reservationService.createReservation(requestDto);
     }
 

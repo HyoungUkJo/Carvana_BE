@@ -148,11 +148,16 @@ public class ReservationService {
         // 이미지 처리
         // 예약을 식별하기 위한 uuid 생성
         String reservationUUID = UUID.randomUUID().toString();
+        List<String> imageKeys = null;
 
-        // 이미지 업로드 후 image key를 받아온다.
-        List<String> imageKeys = request.getImages().stream()
-            .map(image -> storageService.uploadFile(image, "reservation", reservationUUID))
-            .toList();
+        if(request.getImages() != null && !request.getImages().isEmpty()) {
+            // 이미지 업로드 후 image key를 받아온다.
+            System.out.println("이미지 디버깅:"+request.getImages());
+            imageKeys = request.getImages().stream()
+                .filter(file -> !file.isEmpty())
+                .map(image -> storageService.uploadFile(image, "reservation", reservationUUID))
+                .toList();
+        }
 
         //예약 엔티티 생성
         Reservation reservation = Reservation.builder()
@@ -202,7 +207,6 @@ public class ReservationService {
             if (isTimeOverlap(requestReservationStart,requestReservationEnd,existingStart,existingEnd)) {
                 throw new ReservationException("해당 시간에 이미 예약이 존재합니다.");
             }
-
         }
 
         // 저장
@@ -214,8 +218,11 @@ public class ReservationService {
         // 예약 요청 알림
         notificationService.createReservationNotification(customerMember,reservation);
 
-        // 테스트로 presignedUrl 만들어서 그걸 리턴
-        List<String> imageUrls = getPresignedUrls(imageKeys, 60);
+        List<String> imageUrls = null;
+        if(imageKeys != null) {
+            // 테스트로 presignedUrl 만들어서 그걸 리턴
+            imageUrls = getPresignedUrls(imageKeys, 60);
+        }
 
         // 결과
         return ReservationResponseDto.builder()
@@ -227,6 +234,7 @@ public class ReservationService {
             .carNumber(reservation.getCarNumber())
             .bayNumber(reservation.getBayNumber())
             .status(savedReservation.getStatus())
+//            .menuList() // 메뉴 리스트를 추가해야함.
             .build();
 
     }

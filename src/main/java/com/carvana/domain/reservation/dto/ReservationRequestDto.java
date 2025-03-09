@@ -39,6 +39,6 @@ public class ReservationRequestDto {
     @Schema(description = "베이 번호")
     private Integer bayNumber;
 
-    @Schema(description = "차량 이미지 파일들 (선택사항)")
+    @Schema(description = "차량 이미지 파일들 (선택사항)", nullable = true)
     private List<MultipartFile> images;
 }
