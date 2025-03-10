@@ -18,16 +18,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.stream.Collectors;
 
 @PropertySource("classpath:config/secrets.properties")
 @Component
-public class JWTProvider {
+public class JwtTokenProvider {
 
     private final SecretKey key;
     private final long accessTokenSesson;
 
-    public JWTProvider(@Value("${JWT_SECRET_KEY}") String secret, @Value("${JWT_VALIDITY_IN_SECONDS}") long accessTokenSesson) {
+    public JwtTokenProvider(@Value("${JWT_SECRET_KEY}") String secret, @Value("${JWT_VALIDITY_IN_SECONDS}") long accessTokenSesson) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.accessTokenSesson = accessTokenSesson * 1000;
     }
