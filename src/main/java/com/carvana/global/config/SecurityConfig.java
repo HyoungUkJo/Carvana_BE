@@ -36,8 +36,9 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth     // 요청 URL 접근 권한 설정 로그인, 회원가입, 계정찾기? 등 인증이 필요없는 api는 따로 등록해야함
-                .requestMatchers("/api/authenticate").permitAll()
-                .requestMatchers("/api/register").permitAll()
+                .requestMatchers("/api/user/auth/signin").permitAll()
+                .requestMatchers("/api/user/auth/signup").permitAll()
+                .requestMatchers("/api/user/auth/email-exists").permitAll()
                 .anyRequest().authenticated()
             ).addFilterBefore(new JwtFilter(tokenProvider),     // JWT 필터 추가
                 UsernamePasswordAuthenticationFilter.class);

@@ -7,7 +7,11 @@ import com.carvana.domain.customer.member.entity.CustomerMember;
 import com.carvana.domain.customer.member.repository.CustomerMemberRepository;
 import com.carvana.global.exception.custom.DuplicateEmailException;
 import com.carvana.global.exception.custom.IncorrectEmailPasswordException;
+import com.carvana.global.jwt.JwtTokenProvider;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +24,8 @@ public class CustomerAuthService {
 
     private final CustomerAuthRepository customerAuthRepository;        // AuthRepository 의존관계 설정
     private final CustomerMemberRepository customerMemberRepository;    // MemberRepository 의존관계 설정
+    private final PasswordEncoder passwordEncoder;                      // 패스워드 암호화를 위한 인코더 추가
+    private final JwtTokenProvider jwtTokenProvider;                    // jwt토큰을 만들기 위한 브로바이더 추가
 
     @Transactional
     public SignUpResponseDto signUp(SignUpRequestDto signUpRequest) {
@@ -39,6 +45,7 @@ public class CustomerAuthService {
         CustomerAuth customerAuth = CustomerAuth.builder()
             .email(signUpRequest.getEmail())
             .password(signUpRequest.getPassword())
+//            .password(passwordEncoder.encode(signUpRequest.getPassword()))    // 패스워드 암호화 -> 개발단계에서는 생략할지 생각필요.
             .customerMember(customerMember)
             .build();
         customerAuthRepository.save(customerAuth);
@@ -55,14 +62,30 @@ public class CustomerAuthService {
         CustomerAuth customerAuth = customerAuthRepository.findByEmail(signInRequest.getEmail())
             .orElseThrow(() -> new IncorrectEmailPasswordException("아이디 또는 비밀번호가 틀립니다."));
 
+        // 이런식으로 패스워드 암호화 하는지 안하는지 service에서 직접 바꾸는건 객체 지향적이지 않은것 같다고 생각. 패스워드 검증 정책 클래스를 따로 만들어서 거기서 처리 필요
+
         // 패스워드 검사
-        // Todo: 암호화 된 패스워드와 검사
         if(!Objects.equals(customerAuth.getPassword(), signInRequest.getPassword())){
             throw new IncorrectEmailPasswordException("아이디 또는 비밀번호가 틀립니다.");
         }
 
+        // Todo: 암호화 된 패스워드와 검사
+        /*if (!passwordEncoder.matches(signInRequest.getPassword(), customerAuth.getPassword())) {
+            throw new IncorrectEmailPasswordException("아이디 또는 비밀번호가 틀립니다.");
+        }*/
+
         CustomerMember customerMember = customerAuth.getCustomerMember();
-        // 성공여부 리턴 추후 Jwt 리턴
+
+        // jwt 토큰 생성
+        String accessToken = jwtTokenProvider.createAccessToken(customerAuth.getEmail(),"ROLE_USER");
+
+
+        // 토큰을 포함한 응답
+        /*return SignInResponseDto.builder()
+            .name(customerMember.getName())
+            .accessToken(accessToken)
+            .build();*/
+        // 토큰 x
         return SignInResponseDto.builder().name(customerMember.getName()).build();
     }
 
@@ -70,5 +93,21 @@ public class CustomerAuthService {
         boolean exists = customerAuthRepository.existsByEmail(email);
 
         return new EmailCheckResponseDto(exists);
+    }
+
+    public CustomerMemberDto getCurrentUserInfo() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        CustomerAuth auth = customerAuthRepository.findByEmail(email)
+            .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+        CustomerMember customerMember = auth.getCustomerMember();
+
+        return new CustomerMemberDto(
+            customerMember.getName(),
+            customerMember.getPhone(),
+            customerMember.getCarType(),
+            customerMember.getCarNumber()
+        );
     }
 }
