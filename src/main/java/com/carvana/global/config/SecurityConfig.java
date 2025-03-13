@@ -39,6 +39,11 @@ public class SecurityConfig {
                 .requestMatchers("/api/user/auth/signin").permitAll()
                 .requestMatchers("/api/user/auth/signup").permitAll()
                 .requestMatchers("/api/user/auth/email-exists").permitAll()
+                // Swagger UI 관련 경로 추가
+                .requestMatchers("/swagger-ui/**").permitAll()
+                .requestMatchers("/swagger-resources/**").permitAll()
+                .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-ui.html").permitAll()
                 .anyRequest().authenticated()
             ).addFilterBefore(new JwtFilter(tokenProvider),     // JWT 필터 추가
                 UsernamePasswordAuthenticationFilter.class);

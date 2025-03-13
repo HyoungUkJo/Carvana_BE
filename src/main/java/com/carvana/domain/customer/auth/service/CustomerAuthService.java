@@ -44,8 +44,8 @@ public class CustomerAuthService {
         // Todo: 패스워드 암호화
         CustomerAuth customerAuth = CustomerAuth.builder()
             .email(signUpRequest.getEmail())
-            .password(signUpRequest.getPassword())
-//            .password(passwordEncoder.encode(signUpRequest.getPassword()))    // 패스워드 암호화 -> 개발단계에서는 생략할지 생각필요.
+//            .password(signUpRequest.getPassword())
+            .password(passwordEncoder.encode(signUpRequest.getPassword()))    // 패스워드 암호화 -> 개발단계에서는 생략할지 생각필요.
             .customerMember(customerMember)
             .build();
         customerAuthRepository.save(customerAuth);
@@ -65,14 +65,14 @@ public class CustomerAuthService {
         // 이런식으로 패스워드 암호화 하는지 안하는지 service에서 직접 바꾸는건 객체 지향적이지 않은것 같다고 생각. 패스워드 검증 정책 클래스를 따로 만들어서 거기서 처리 필요
 
         // 패스워드 검사
-        if(!Objects.equals(customerAuth.getPassword(), signInRequest.getPassword())){
-            throw new IncorrectEmailPasswordException("아이디 또는 비밀번호가 틀립니다.");
-        }
+//        if(!Objects.equals(customerAuth.getPassword(), signInRequest.getPassword())){
+//            throw new IncorrectEmailPasswordException("아이디 또는 비밀번호가 틀립니다.");
+//        }
 
         // Todo: 암호화 된 패스워드와 검사
-        /*if (!passwordEncoder.matches(signInRequest.getPassword(), customerAuth.getPassword())) {
+        if (!passwordEncoder.matches(signInRequest.getPassword(), customerAuth.getPassword())) {
             throw new IncorrectEmailPasswordException("아이디 또는 비밀번호가 틀립니다.");
-        }*/
+        }
 
         CustomerMember customerMember = customerAuth.getCustomerMember();
 
@@ -81,12 +81,12 @@ public class CustomerAuthService {
 
 
         // 토큰을 포함한 응답
-        /*return SignInResponseDto.builder()
+        return SignInResponseDto.builder()
             .name(customerMember.getName())
             .accessToken(accessToken)
-            .build();*/
+            .build();
         // 토큰 x
-        return SignInResponseDto.builder().name(customerMember.getName()).build();
+//        return SignInResponseDto.builder().name(customerMember.getName()).build();
     }
 
     public EmailCheckResponseDto checkEmailDuplicate(String email) {
