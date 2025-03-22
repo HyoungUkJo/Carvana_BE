@@ -18,30 +18,27 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.stream.Collectors;
 
 @PropertySource("classpath:config/secrets.properties")
 @Component
-public class JWTProvider {
+public class JwtTokenProvider {
 
     private final SecretKey key;
     private final long accessTokenSesson;
 
-    public JWTProvider(@Value("${JWT_SECRET_KEY}") String secret, @Value("${JWT_VALIDITY_IN_SECONDS}") long accessTokenSesson) {
+    public JwtTokenProvider(@Value("${JWT_SECRET_KEY}") String secret, @Value("${JWT_VALIDITY_IN_SECONDS}") long accessTokenSesson) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.accessTokenSesson = accessTokenSesson * 1000;
     }
 
     // JWT 액세스 토큰 생성
-    public String createAccessToken(String email, Collection<String> authorities) {
+    public String createAccessToken(String email, String authority) {
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.accessTokenSesson);
 
-        String authoritiesString = String.join(",", authorities);
-
         return Jwts.builder()
             .subject(email)
-            .claim("auth", authoritiesString)
+            .claim("auth", authority) // 단순히 "ROLE_USER" 또는 "ROLE_OWNER"
             .issuedAt(new Date())
             .expiration(validity)
             .signWith(key)

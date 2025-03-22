@@ -20,6 +20,10 @@ public class OwnerAuth {
 
     private String password;
 
+    private String address;
+
+    private String typeOfBusiness;
+
     // jwt 리프레시 토큰
 //    private String refreshToken;
 
@@ -31,10 +35,16 @@ public class OwnerAuth {
     private OwnerMember ownerMember;
 
     @Builder
-    public OwnerAuth(String email, String password, OwnerMember ownerMember) {
+    public OwnerAuth(String email,
+                     String password,
+                     OwnerMember ownerMember,
+                     String address,
+                     String typeOfBusiness) {
         this.email = email;
         this.password = password;
         this.ownerMember = ownerMember;
+        this.address = address;
+        this.typeOfBusiness = typeOfBusiness;
     }
 
 /*    public void updateRefreshToken(String refreshToken) {

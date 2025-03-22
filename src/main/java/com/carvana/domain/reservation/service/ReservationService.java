@@ -138,6 +138,7 @@ public class ReservationService {
     @Transactional
     public ReservationResponseDto createReservation(ReservationRequestDto request) {
 
+
         // 요청 엔티티 조회 (회원, 세차장, 메뉴)
         CustomerMember customerMember = customerMemberRepository.findById(request.getCustomerMemberID())
             .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다."));

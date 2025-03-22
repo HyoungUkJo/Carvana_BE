@@ -25,6 +25,10 @@ public class OwnerMember {
 
     private String businessNumber; //사업자 번호
 
+    private String address;         // 집주소
+
+    private String typeOfBusiness;  // 업종
+
     @OneToMany(mappedBy = "ownerMember")
     private final List<CarWash> carWashes = new ArrayList<>();
 
