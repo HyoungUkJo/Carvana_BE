@@ -1,16 +1,18 @@
 package com.carvana.domain.owner.auth.service;
 
-import com.carvana.domain.owner.auth.dto.SignInRequestDto;
-import com.carvana.domain.owner.auth.dto.SignInResponseDto;
-import com.carvana.domain.owner.auth.dto.SignUpResponseDto;
-import com.carvana.domain.owner.auth.dto.SignUpRequestDto;
+import com.carvana.domain.customer.auth.dto.CustomerMemberDto;
+import com.carvana.domain.customer.auth.entity.CustomerAuth;
+import com.carvana.domain.customer.member.entity.CustomerMember;
+import com.carvana.domain.owner.auth.dto.*;
 import com.carvana.domain.owner.auth.entity.OwnerAuth;
 import com.carvana.domain.owner.auth.repository.OwnerAuthRepository;
 import com.carvana.domain.owner.member.entity.OwnerMember;
 import com.carvana.domain.owner.member.repository.OwnerMemberRepository;
 import com.carvana.global.exception.custom.DuplicateEmailException;
 import com.carvana.global.exception.custom.IncorrectEmailPasswordException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,4 +70,24 @@ public class OwnerAuthService {
         // 성공여부 리턴 추후 Jwt 리턴
         return SignInResponseDto.builder().name(ownerMember.getName()).build();
     }
+
+    // 토큰을 통해
+    // 로그인한 계정 알려주는 로직
+    public OwnerMemberDto getCurrentUserInfo() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        OwnerAuth auth = ownerAuthRepository.findByEmail(email)
+            .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+        OwnerMember ownerMember = auth.getOwnerMember();
+
+        return new OwnerMemberDto(
+            ownerMember.getName(),
+            ownerMember.getPhone(),
+            ownerMember.getBusinessNumber(),
+            ownerMember.getCarWashes(),
+            ownerMember.getAddress()
+        );
+    }
+
 }

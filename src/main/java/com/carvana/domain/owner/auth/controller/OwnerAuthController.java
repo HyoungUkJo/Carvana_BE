@@ -1,15 +1,9 @@
 package com.carvana.domain.owner.auth.controller;
 
-import com.carvana.domain.owner.auth.dto.SignInRequestDto;
-import com.carvana.domain.owner.auth.dto.SignInResponseDto;
-import com.carvana.domain.owner.auth.dto.SignUpRequestDto;
-import com.carvana.domain.owner.auth.dto.SignUpResponseDto;
+import com.carvana.domain.owner.auth.dto.*;
 import com.carvana.domain.owner.auth.service.OwnerAuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,5 +19,10 @@ public class OwnerAuthController {
     @PostMapping("/signin")
     public SignInResponseDto signIn(@RequestBody SignInRequestDto signInRequestDto) {
         return ownerAuthService.signIn(signInRequestDto);
+    }
+
+    @GetMapping("/me")
+    public OwnerMemberDto getCurrentUserInfo() {
+        return ownerAuthService.getCurrentUserInfo();
     }
 }
