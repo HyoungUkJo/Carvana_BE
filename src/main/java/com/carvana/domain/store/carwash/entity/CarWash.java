@@ -1,7 +1,7 @@
 package com.carvana.domain.store.carwash.entity;
 
 import com.carvana.domain.owner.member.entity.OwnerMember;
-import com.carvana.domain.store.carwash.dto.CarWashProfileUpdateRequestDto;
+import com.carvana.domain.store.carwash.dto.CarWashProfileUpdateDto;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -66,7 +66,7 @@ public class CarWash {
 
     // 프로필 수정
     // TODO: 썸네일 오브젝트 키 수정하도록 변경 (지금은 받은 요청 그대로 덮어 씌우고 있음)
-    public void updateCarWash(CarWashProfileUpdateRequestDto dto) {
+    public void updateCarWash(CarWashProfileUpdateDto dto) {
         if (dto.getName() != null) {
             this.name = dto.getName();
         }
@@ -85,8 +85,8 @@ public class CarWash {
         if (dto.getBusinessNumber() != null) {
             this.ownerMember.setBusinessNumber(dto.getBusinessNumber());
         }
-        if (dto.getThumbnailImgUrl() != null) {
-            this.thumbnailImgKey = dto.getThumbnailImgUrl();
+        if (dto.getThumbnailImgKey() != null) {
+            this.thumbnailImgKey = dto.getThumbnailImgKey();
         }
     }
 }

@@ -47,6 +47,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/owner/auth/signup").permitAll()
                 .requestMatchers("/api/owner/auth/email-exists").permitAll()
 
+                // 테스트용 api -> TODO: 반드시 삭제해야함
+                .requestMatchers("/api/carwash/**").permitAll()
+
                 // Swagger UI 관련 경로 추가
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/swagger-resources/**").permitAll()

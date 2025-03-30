@@ -1,8 +1,9 @@
 package com.carvana.domain.store.carwash.service;
 
+import com.carvana.domain.owner.auth.entity.OwnerAuth;
+import com.carvana.domain.owner.auth.repository.OwnerAuthRepository;
 import com.carvana.domain.owner.member.entity.OwnerMember;
 import com.carvana.domain.owner.member.repository.OwnerMemberRepository;
-import com.carvana.domain.reservation.dto.MonthlyStatsDto;
 import com.carvana.domain.reservation.entity.Reservation;
 import com.carvana.domain.reservation.entity.ReservationStatus;
 import com.carvana.domain.reservation.repository.ReservationRepository;
@@ -12,13 +13,13 @@ import com.carvana.domain.store.carwash.entity.CarWash;
 import com.carvana.domain.store.carwash.entity.CarWashBusinessTarget;
 import com.carvana.domain.store.carwash.entity.CarWashMenu;
 import com.carvana.domain.store.carwash.repository.CarWashBusinessTargetRepository;
-import com.carvana.domain.store.carwash.repository.CarWashMenuRepository;
 import com.carvana.domain.store.carwash.repository.CarWashRepository;
 import com.carvana.global.exception.custom.IncorrectEmailPasswordException;
 import com.carvana.global.storage.service.PresignedUrlService;
 import com.carvana.global.storage.service.StorageService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +34,7 @@ import java.util.UUID;
 public class CarWashService {
     private final CarWashRepository carWashRepository;
     private final OwnerMemberRepository ownerMemberRepository;
-    private final CarWashMenuRepository carWashMenuRepository;
+    private final OwnerAuthRepository ownerAuthRepository;
     private final CarWashBusinessTargetRepository carWashBusinessTargetRepository;
     private final ReservationRepository reservationRepository;
     private final ReviewRepository reviewRepository;
@@ -41,23 +42,39 @@ public class CarWashService {
     private final StorageService storageService;
 
     public RegisterCarWashResponseDto registerCarWash(RegisterCarWashRequestDto registerCarWashRequestDto) {
-        // 실제 오너가 있는지 검증
-        OwnerMember ownerMember = ownerMemberRepository.findById(registerCarWashRequestDto.getOwnerId())
-            .orElseThrow(() -> new IncorrectEmailPasswordException("아이디 또는 비밀번호가 틀립니다."));
+        // JWT를 이용해 실제 오너가 있는지 검증
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        OwnerAuth auth = ownerAuthRepository.findByEmail(email)
+            .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+        OwnerMember ownerMember = auth.getOwnerMember();
 
         // uuid 생성
         String carWashUUID = UUID.randomUUID().toString();
 
-        // 사진 등록
-        String thumbnailKey = storageService.uploadFile(registerCarWashRequestDto.getThumbnailImg(), "carwash_thumbnail", carWashUUID);
+        // 키를 null로 미리 선언 -> 이미지가 없을 경우를 대비
+        String thumbnailKey = null;
+
+        // 이미지를 넣지 않았을때를 대비한 조건문 처리
+        if(registerCarWashRequestDto.getThumbnailImg() != null
+            && !registerCarWashRequestDto.getThumbnailImg().isEmpty()){
+            // 사진 등록
+            thumbnailKey = storageService.uploadFile(registerCarWashRequestDto.getThumbnailImg(),
+                "carwash_thumbnail",
+                carWashUUID);
+        }
+
 
         // 추후 중복되는 주소 또는 번호로 검증해야할듯?
         CarWash carWash = CarWash.builder()
             .name(registerCarWashRequestDto.getName())
+            .bayCount(registerCarWashRequestDto.getBayCount())
             .phone(registerCarWashRequestDto.getPhone())
             .address(registerCarWashRequestDto.getAddress())
             .businessHours(registerCarWashRequestDto.getBusinessHours())
             .thumbnailImgKey(thumbnailKey)
+            .uuid(carWashUUID)
             .build();
 
         ownerMember.addCarWash(carWash);
@@ -103,6 +120,7 @@ public class CarWashService {
             .bayCount(carWash.getBayCount())
             .phone(carWash.getPhone())
             .businessHours(carWash.getBusinessHours())
+            .thumbnailImgUrl(carWash.getThumbnailImgKey())
             .build();
     }
 
@@ -110,7 +128,29 @@ public class CarWashService {
     // 세차장 프로필 수정
     public CarWashProfileResponseDto updateCarWashProfile(Long carWashId,CarWashProfileUpdateRequestDto dto) {
         CarWash carWash = carWashRepository.findById(carWashId).orElseThrow(() -> new EntityNotFoundException("해당하는 세차장이 없습니다."));
-        carWash.updateCarWash(dto);
+        String thumbnailImgKey = carWash.getThumbnailImgKey();
+
+        if(dto.getThumbnailImgUrl()!=null && !dto.getThumbnailImgUrl().isEmpty()) {
+            // 기존 썸네일이 있는 경우 삭제
+            if(thumbnailImgKey != null && !thumbnailImgKey.isEmpty()) {
+                storageService.deleteFile(thumbnailImgKey);
+            }
+            thumbnailImgKey = storageService.uploadFile(dto.getThumbnailImgUrl(),
+                "carwash_thumbnail",
+                carWash.getUuid());
+        }
+
+        CarWashProfileUpdateDto updateDto = CarWashProfileUpdateDto.builder()
+            .name(dto.getName())
+            .address(dto.getAddress())
+            .phone(dto.getPhone())
+            .businessHours(dto.getBusinessHours())
+            .bayCount(dto.getBayCount())
+            .businessNumber(dto.getBusinessNumber())
+            .thumbnailImgKey(thumbnailImgKey) // 처리된 S3 키
+            .build();
+        // 변경 사항 저
+        carWash.updateCarWash(updateDto);
 
         return CarWashProfileResponseDto.builder()
             .name(carWash.getName())
@@ -140,7 +180,7 @@ public class CarWashService {
             .monthlyWorkloadTarget(0)
             .monthlyRevenueTarget(0)
             .monthlyReviewTarget(0)
-            .build());;
+            .build());
 
         //4. 예약 리스트에서 예약 수와 매출액을 리뷰와 함께 return한다.
         return CarWashMonthlyStatsDto.builder()
@@ -159,7 +199,7 @@ public class CarWashService {
     @Transactional
     public CarWashBusinessTarget setCarWashTarget(SetCarWashTargetRequestDto dto) {
         CarWash carWash = carWashRepository.findById(dto.getCarWashId()).orElseThrow(() -> {
-            return new EntityNotFoundException("해당하는 세차장이 없습니다.");
+            throw new EntityNotFoundException("해당하는 세차장이 없습니다.");
         });
 
         return carWashBusinessTargetRepository.findByCarWashId(carWash.getId()).orElseGet(() -> CarWashBusinessTarget.builder()

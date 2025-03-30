@@ -10,6 +10,7 @@ import com.carvana.domain.owner.member.entity.OwnerMember;
 import com.carvana.domain.owner.member.repository.OwnerMemberRepository;
 import com.carvana.global.exception.custom.DuplicateEmailException;
 import com.carvana.global.exception.custom.IncorrectEmailPasswordException;
+import com.carvana.global.jwt.JwtTokenProvider;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +26,7 @@ public class OwnerAuthService {
 
     private final OwnerAuthRepository ownerAuthRepository;        // AuthRepository 의존관계 설정
     private final OwnerMemberRepository ownerMemberRepository;    // MemberRepository 의존관계 설정
+    private final JwtTokenProvider jwtTokenProvider;                // jwtToken Provider 의존관계 설정
 
     @Transactional
     public SignUpResponseDto signUp(SignUpRequestDto signUpRequest) {
@@ -67,8 +69,14 @@ public class OwnerAuthService {
         }
 
         OwnerMember ownerMember = ownerAuth.getOwnerMember();
+
+        String accessToken = jwtTokenProvider.createAccessToken(ownerAuth.getEmail(), "ROLE_OWNER");
+
         // 성공여부 리턴 추후 Jwt 리턴
-        return SignInResponseDto.builder().name(ownerMember.getName()).build();
+        return SignInResponseDto.builder()
+            .name(ownerMember.getName())
+            .accessToken(accessToken)
+            .build();
     }
 
     // 토큰을 통해
