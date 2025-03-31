@@ -44,7 +44,6 @@ public class CarWashService {
     public RegisterCarWashResponseDto registerCarWash(RegisterCarWashRequestDto registerCarWashRequestDto) {
         // JWT를 이용해 실제 오너가 있는지 검증
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
         OwnerAuth auth = ownerAuthRepository.findByEmail(email)
             .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
 
@@ -55,15 +54,21 @@ public class CarWashService {
 
         // 키를 null로 미리 선언 -> 이미지가 없을 경우를 대비
         String thumbnailKey = null;
+        System.out.println("이미지 디버깅:"+registerCarWashRequestDto.getThumbnailImg());
+
 
         // 이미지를 넣지 않았을때를 대비한 조건문 처리
         if(registerCarWashRequestDto.getThumbnailImg() != null
             && !registerCarWashRequestDto.getThumbnailImg().isEmpty()){
             // 사진 등록
+            System.out.println("이미지 디버깅:"+registerCarWashRequestDto.getThumbnailImg());
+
             thumbnailKey = storageService.uploadFile(registerCarWashRequestDto.getThumbnailImg(),
                 "carwash_thumbnail",
                 carWashUUID);
         }
+
+        System.out.println("thumbnailKey: "+thumbnailKey);
 
 
         // 추후 중복되는 주소 또는 번호로 검증해야할듯?

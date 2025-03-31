@@ -4,11 +4,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @NoArgsConstructor
 @Schema(description = "세차장 등록 요청 DTO")
+@Setter
 public class RegisterCarWashRequestDto {
 //    @Schema(description = "사장 id")
 //    private Long ownerId; // 임시로 ownerId를 요청
