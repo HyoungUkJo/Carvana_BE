@@ -132,15 +132,28 @@ public class CarWashService {
 
     // 세차장 프로필 수정
     public CarWashProfileResponseDto updateCarWashProfile(Long carWashId,CarWashProfileUpdateRequestDto dto) {
-        CarWash carWash = carWashRepository.findById(carWashId).orElseThrow(() -> new EntityNotFoundException("해당하는 세차장이 없습니다."));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        OwnerAuth auth = ownerAuthRepository.findByEmail(email)
+            .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+        // 오너의 carWash List와 같이 검증하는 로직 작성
+        OwnerMember ownerMember = auth.getOwnerMember();
+        List<CarWash> carWashList = ownerMember.getCarWashes();
+
+        // 임시
+        CarWash carWash = carWashRepository.findById(dto.getCarWashId())
+            .orElseThrow(() -> new EntityNotFoundException("세차장을 찾을 수 없음"));
+
         String thumbnailImgKey = carWash.getThumbnailImgKey();
 
-        if(dto.getThumbnailImgUrl()!=null && !dto.getThumbnailImgUrl().isEmpty()) {
+
+        if(dto.getThumbnailImg()!=null && !dto.getThumbnailImg().isEmpty()) {
+            System.out.println("여기까지는 들어옴");
             // 기존 썸네일이 있는 경우 삭제
             if(thumbnailImgKey != null && !thumbnailImgKey.isEmpty()) {
                 storageService.deleteFile(thumbnailImgKey);
             }
-            thumbnailImgKey = storageService.uploadFile(dto.getThumbnailImgUrl(),
+            thumbnailImgKey = storageService.uploadFile(dto.getThumbnailImg(),
                 "carwash_thumbnail",
                 carWash.getUuid());
         }
@@ -164,6 +177,9 @@ public class CarWashService {
             .bayCount(carWash.getBayCount())
             .phone(carWash.getPhone())
             .businessHours(carWash.getBusinessHours())
+            .thumbnailImgUrl(
+                presignedUrlService.generatePresignedUrl(carWash.getThumbnailImgKey(),60)
+            )
             .build();
     }
     public CarWashMonthlyStatsDto getMonthlyStats(Long carWashId) {

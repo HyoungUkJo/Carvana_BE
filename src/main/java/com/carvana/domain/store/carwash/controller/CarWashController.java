@@ -55,8 +55,17 @@ public class CarWashController {
 
     // 세차장 프로필 수정
     @Operation(summary = "세차장 프로필 수정", description = "세차장 프로필 수정 API")
-    @PostMapping("/{carWashId}/profile/update")
-    public CarWashProfileResponseDto updateCarWashProfile(@PathVariable Long carWashId, @RequestBody CarWashProfileUpdateRequestDto updateRequestDto) {
+    @PostMapping(value = "/{carWashId}/profile/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public CarWashProfileResponseDto updateCarWashProfile(@PathVariable Long carWashId, @ModelAttribute CarWashProfileUpdateRequestDto updateRequestDto) {
+        // 디버깅용
+        System.out.println("=== Request received ===");
+        if (updateRequestDto.getThumbnailImg() == null) {
+            System.out.println("Images is null");
+            throw new ReservationException("이미지가 넘어오지 않았음");
+        } else {
+            System.out.println("Image name: " + updateRequestDto.getThumbnailImg().getOriginalFilename() + ", size: " + updateRequestDto.getThumbnailImg().getSize()
+            );
+        }
         return carWashService.updateCarWashProfile(carWashId, updateRequestDto);
     }
 
