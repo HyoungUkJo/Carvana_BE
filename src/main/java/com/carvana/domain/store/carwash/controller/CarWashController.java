@@ -23,21 +23,20 @@ public class CarWashController {
 
     @Operation(summary = "세차장등록", description = "세차장 등록하는 API")
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public RegisterCarWashResponseDto registerCarWash(@ModelAttribute RegisterCarWashRequestDto registerCarWashRequestDto,
-                                                      @RequestPart(value = "images", required = false) MultipartFile thumbnailImg) {
+    public RegisterCarWashResponseDto registerCarWash(@ModelAttribute RegisterCarWashRequestDto registerCarWashRequestDto) {
         // 토큰이 있다면 여기서 사용자 인증을 해야함
         // 테스트로 쓰는것임으로 일단은 사장 Id를 따로 받는것으로 테스트
         // TODO: 추후 토큰으로 확인할 수 있도록 Auth도 의존관계 설정
         //
         // 디버깅용
-        System.out.println("=== Request received ===");
-        if (registerCarWashRequestDto.getThumbnailImg() == null) {
-            System.out.println("Images is null");
-            throw new ReservationException("이미지가 넘어오지 않았음");
-        } else {
-            System.out.println("Image name: " + registerCarWashRequestDto.getThumbnailImg().getOriginalFilename() + ", size: " + registerCarWashRequestDto.getThumbnailImg().getSize()
-            );
-        }
+//        System.out.println("=== Request received ===");
+//        if (registerCarWashRequestDto.getThumbnailImg() == null) {
+//            System.out.println("Images is null");
+//            throw new ReservationException("이미지가 넘어오지 않았음");
+//        } else {
+//            System.out.println("Image name: " + registerCarWashRequestDto.getThumbnailImg().getOriginalFilename() + ", size: " + registerCarWashRequestDto.getThumbnailImg().getSize()
+//            );
+//        }
         return carWashService.registerCarWash(registerCarWashRequestDto);
     }
 
@@ -56,8 +55,17 @@ public class CarWashController {
 
     // 세차장 프로필 수정
     @Operation(summary = "세차장 프로필 수정", description = "세차장 프로필 수정 API")
-    @PostMapping("/{carWashId}/profile/update")
-    public CarWashProfileResponseDto updateCarWashProfile(@PathVariable Long carWashId, @RequestBody CarWashProfileUpdateRequestDto updateRequestDto) {
+    @PostMapping(value = "/{carWashId}/profile/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public CarWashProfileResponseDto updateCarWashProfile(@PathVariable Long carWashId, @ModelAttribute CarWashProfileUpdateRequestDto updateRequestDto) {
+        // 디버깅용
+        System.out.println("=== Request received ===");
+        if (updateRequestDto.getThumbnailImg() == null) {
+            System.out.println("Images is null");
+            throw new ReservationException("이미지가 넘어오지 않았음");
+        } else {
+            System.out.println("Image name: " + updateRequestDto.getThumbnailImg().getOriginalFilename() + ", size: " + updateRequestDto.getThumbnailImg().getSize()
+            );
+        }
         return carWashService.updateCarWashProfile(carWashId, updateRequestDto);
     }
 
