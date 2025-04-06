@@ -29,23 +29,28 @@ public class OwnerAuthService {
     private final JwtTokenProvider jwtTokenProvider;                // jwtToken Provider 의존관계 설정
 
     @Transactional
-    public SignUpResponseDto signUp(SignUpRequestDto signUpRequest) {
+    public SignUpResponseDto signUp(SignUpRequestDto signUpRequestDto) {
         // 이메일 중복검사
-        if (ownerAuthRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (ownerAuthRepository.existsByEmail(signUpRequestDto.getEmail())) {
             throw new DuplicateEmailException("이미 존재하는 이메일입니다.");
         }
         // 패스워드 유효성 검사 -> 이후에 설정
         // validatePassword()
 
         // 멤버 엔티티 생성
-        OwnerMember ownerMember = new OwnerMember(signUpRequest.getName(), signUpRequest.getPhone());
+        OwnerMember ownerMember = OwnerMember.builder()
+            .address(signUpRequestDto.getAddress())
+            .phone(signUpRequestDto.getPhone())
+            .typeOfBusiness(signUpRequestDto.getTypeOfBusiness())
+            .name(signUpRequestDto.getName())
+            .build();
         ownerMemberRepository.save(ownerMember);
 
         // auth 엔티티 생성 저장 -> 인증 토큰 관리 -> 추후 레디스로
         // Todo: 패스워드 암호화
         OwnerAuth ownerAuth = OwnerAuth.builder()
-            .email(signUpRequest.getEmail())
-            .password(signUpRequest.getPassword())
+            .email(signUpRequestDto.getEmail())
+            .password(signUpRequestDto.getPassword())
             .ownerMember(ownerMember)
             .build();
         ownerAuthRepository.save(ownerAuth);
