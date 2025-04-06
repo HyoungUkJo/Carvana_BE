@@ -5,6 +5,7 @@ import com.carvana.domain.reservation.entity.Reservation;
 import com.carvana.domain.store.carwash.entity.CarWash;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -46,6 +47,21 @@ public class OwnerMember {
     public void addCarWash(CarWash carWash) {
         this.carWashes.add(carWash);
         carWash.setOwnerMember(this);
+    }
+
+    @Builder
+    public OwnerMember(String name,
+                       String phone,
+                       String businessNumber,
+                       String address,
+                       String typeOfBusiness,
+                       OwnerAuth ownerAuth) {
+        this.name = name;
+        this.phone = phone;
+        this.businessNumber = businessNumber;
+        this.address = address;
+        this.typeOfBusiness = typeOfBusiness;
+        this.ownerAuth = ownerAuth;
     }
 
     public void setBusinessNumber(String businessNumber) {
