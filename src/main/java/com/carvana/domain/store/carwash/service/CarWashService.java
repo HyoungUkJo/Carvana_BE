@@ -251,4 +251,19 @@ public class CarWashService {
             .build();
     }
 
+    // 세차장 검색
+    public List<CarWashResponseDto> searchCarWashes(CarWashSearchRequestDto searchRequestDto) {
+        // 쿼리 검색
+        List<CarWash> carWashes = carWashRepository.search(searchRequestDto.getName(),
+            searchRequestDto.getRegion(),
+            searchRequestDto.getDistrict(),
+            searchRequestDto.getMenuName(),
+            searchRequestDto.getMinPrice(),
+            searchRequestDto.getMaxPrice());
+
+        // 검색 후 나온 Carwash 객체를 responsedto 형식으로 변형 후 응답한다.
+        return carWashes.stream().map(CarWashResponseDto::from).toList();
+
+    }
+
 }
