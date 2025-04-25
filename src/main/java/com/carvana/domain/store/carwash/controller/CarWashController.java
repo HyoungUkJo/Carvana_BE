@@ -86,8 +86,8 @@ public class CarWashController {
     // 업체 검색
     @Operation(summary = "업체 검색", description = "업체 검색")
     @GetMapping("/searchByName")
-    public void searchCarWash() {
-        return ;
+    public List<CarWashResponseDto> searchCarWash(CarWashSearchRequestDto searchRequestDto) {
+        return carWashService.searchCarWashes(searchRequestDto);
     }
 
 }
