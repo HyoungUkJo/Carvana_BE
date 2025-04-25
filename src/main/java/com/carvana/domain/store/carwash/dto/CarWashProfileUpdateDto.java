@@ -14,5 +14,6 @@ public class CarWashProfileUpdateDto {
     private Integer bayCount;   // 베이 수
     private String businessNumber; //사업자 번호
     private String thumbnailImgKey; // 대표 이미지(썸네일)
-
+    private String region;      // 예: 서울
+    private String district;    // 예: 강남구
 }
