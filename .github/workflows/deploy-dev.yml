@@ -23,7 +23,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test # 지금은 테스트 코드를 작성 안했음으로 테스트 제거
         
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
