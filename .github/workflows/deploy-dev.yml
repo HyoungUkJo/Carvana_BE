@@ -41,9 +41,16 @@ jobs:
         env:
           REGISTRY: ${{ secrets.ECR_REGISTRY }}
           REPOSITORY: carava/carwash-dev
-        run: |
-          IMAGE_TAG=latest
-          docker build -t $REPOSITORY .
-          docker tag $REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG
-          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+        # 태그를 쓰지 않는 방식으로 수정
+          run: |
+            IMAGE_TAG=latest
+            FULL_IMAGE=$REGISTRY/$REPOSITORY:$IMAGE_TAG
+            docker build -t $FULL_IMAGE .
+            docker push $FULL_IMAGE
+        # 태그방식 주석 처리 -> 이후 태그가 필요 없을경우 제거 예정    
+        #run: |
+         # IMAGE_TAG=latest
+         # docker build -t $REPOSITORY .
+         # docker tag $REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG
+         # docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
