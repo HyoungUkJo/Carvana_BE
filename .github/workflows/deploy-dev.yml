@@ -36,6 +36,9 @@ jobs:
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
           | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+          
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Build, tag, and push Docker image to Dev ECR
         env:
