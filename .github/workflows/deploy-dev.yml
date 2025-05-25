@@ -38,16 +38,23 @@ jobs:
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
           | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
+      - name: Verify environment variables
+        run: |
+          echo "ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}"
+          echo "REPOSITORY: carava/carwash-dev"
+          echo "IMAGE_TAG: ${{ github.sha }}"
+          echo "Current directory: $(pwd)"
+          echo "Dockerfile exists: $(test -f Dockerfile && echo 'yes' || echo 'no')"
+
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG: ${{ github.sha }}
           REPOSITORY: carava/carwash-dev
-          DOCKER_BUILDKIT: 0
         run: |
-          IMAGE_URI=${ECR_REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
+          IMAGE_URI="${ECR_REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
           echo "Building image: $IMAGE_URI"
-          docker build --platform linux/amd64 -t $IMAGE_URI .
-          docker push $IMAGE_URI
-          echo "image=$IMAGE_URI" >> $GITHUB_OUTPUT
+          docker build --platform linux/amd64 -t "${IMAGE_URI}" .
+          docker push "${IMAGE_URI}"
+          echo "image=${IMAGE_URI}" >> $GITHUB_OUTPUT
