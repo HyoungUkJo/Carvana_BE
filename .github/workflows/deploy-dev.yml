@@ -47,6 +47,7 @@ jobs:
             FULL_IMAGE=$REGISTRY/$REPOSITORY:$IMAGE_TAG
             docker build -t $FULL_IMAGE .
             docker push $FULL_IMAGE
+          
         # 태그방식 주석 처리 -> 이후 태그가 필요 없을경우 제거 예정    
         #run: |
          # IMAGE_TAG=latest
