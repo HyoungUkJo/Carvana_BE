@@ -1,0 +1,49 @@
+name: Deploy to Amazon ECR
+# 어떤 작업이 일어났을때 트리거가 동작하는지. -> 트리거 설정
+on:
+# push가 발생했을때
+  push:
+  # 어떤 브랜치에
+    branches:
+      # main 브랜치에 push가 발생했을때 실행
+      - main
+      
+# 작업정의
+jobs:
+  # 배포 작업을 한다.
+  deploy:
+    # 우분투 최신버전에서
+    runs-on: ubuntu-latest
+
+  # 다음 작업을 순차적으로 진행
+    steps:
+    # 레포지토리의 코드를 가지고 옴
+      - name: Checkout code
+        uses: actions/checkout@v3
+    
+    # AWS 인증을 설정함 (IAM 설정)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      
+      # AWS ECR 로그인
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
+          | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }} 
+
+      # Docker 이미지 빌드 & 푸시
+      - name: Build, tag, and push Docker image
+        env:
+          REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+        run: |
+          IMAGE_TAG=latest
+          docker build -t $REPOSITORY:$IMAGE_TAG .
+          docker tag $REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+  
