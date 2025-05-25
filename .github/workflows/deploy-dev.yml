@@ -44,6 +44,7 @@ jobs:
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG: ${{ github.sha }}
           REPOSITORY: carava/carwash-dev
+          DOCKER_BUILDKIT: 0 
         run: |
           IMAGE_URI=$ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
           echo "Building image: $IMAGE_URI"
