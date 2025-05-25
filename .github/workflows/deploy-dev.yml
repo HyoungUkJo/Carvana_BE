@@ -23,7 +23,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew clean build -x test # 지금은 테스트 코드를 작성 안했음으로 테스트 제거
+        run: ./gradlew clean build -x test
         
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -33,34 +33,20 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Login to Amazon ECR
+        id: login-ecr
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
           | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-          
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
 
-      - name: Build, tag, and push Docker image to Dev ECR
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
         env:
-          REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          IMAGE_TAG: ${{ github.sha }}
           REPOSITORY: carava/carwash-dev
-        # 태그를 쓰지 않는 방식으로 빌드 후 push  
-        # buildx 를 쓰지 않도록 설정
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.ECR_REGISTRY }}/carvana/carwash-dev:latest
-       # run: |
-       #   docker buildx use default 
-       #   IMAGE_TAG=latest
-       #   FULL_IMAGE=$REGISTRY/$REPOSITORY:$IMAGE_TAG
-       #   docker build -t $FULL_IMAGE .
-       #   docker push $FULL_IMAGE
-        # 태그방식 주석 처리 -> 이후 태그가 필요 없을경우 제거 예정    
-        #run: |
-         # IMAGE_TAG=latest
-         # docker build -t $REPOSITORY .
-         # docker tag $REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG
-         # docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
-
+        run: |
+          IMAGE_URI=$ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
+          echo "Building image: $IMAGE_URI"
+          docker build --platform linux/amd64 -t $IMAGE_URI -f Dockerfile.production .
+          docker push $IMAGE_URI
+          echo "image=$IMAGE_URI" >> $GITHUB_OUTPUT
