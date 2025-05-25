@@ -45,8 +45,9 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           REPOSITORY: carava/carwash-dev
           DOCKER_BUILDKIT: 0 
+          IMAGE_URI: ${{ secrets.ECR_REGISTRY }}/carava/carwash-dev:${{ github.sha }}
+
         run: |
-          IMAGE_URI=$ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
           echo "Building image: $IMAGE_URI"
           docker build --platform linux/amd64 -t $IMAGE_URI .
           docker push $IMAGE_URI
