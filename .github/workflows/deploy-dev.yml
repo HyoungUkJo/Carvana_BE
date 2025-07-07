@@ -51,8 +51,10 @@ jobs:
         env:
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           REPOSITORY: ${{ secrets.ECR_DEV_REPOSITORY }}
+          SHORT_SHA: ${{ steps.vars.outputs.SHORT_SHA }}
+
         run: |
-          IMAGE_TAG=dev-${{ steps.vars.outputs.SHORT_SHA }}
+          IMAGE_TAG=dev-${{ SHORT_SHA }}
           IMAGE_URI="${ECR_REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
           echo "Building image: $IMAGE_URI"
           docker build --platform linux/amd64 -t "${IMAGE_URI}" .
