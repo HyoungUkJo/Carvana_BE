@@ -22,7 +22,7 @@ public class ReservationResponseDto {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime reservationDateTime;
     private String request;
-    private String imageUrl;
+    private List<String> imageUrl;
     private String carType;
     private String carNumber;   //  차번호
     private ReservationStatus status;
@@ -31,7 +31,7 @@ public class ReservationResponseDto {
 
     @Builder
     public ReservationResponseDto(Long reservationId, LocalDateTime reservationDateTime,
-                                  String request, String imageUrl, String carType, String carNumber,
+                                  String request, List<String> imageUrl, String carType, String carNumber,
                                   ReservationStatus status, List<String> menuList, Integer bayNumber) {
         this.reservationId = reservationId;
         this.reservationDateTime = reservationDateTime;

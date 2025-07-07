@@ -11,13 +11,6 @@ public class SignUpRequestDto {
     private String password;
     private String name;
     private String phone;
-
-    @Builder
-    public SignUpRequestDto(String email, String password,
-                            String name, String phone) {
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.phone = phone;
-    }
+    private String typeOfBusiness;  // 업종 -> TODO : 논의 필요 -> 업종이 두개일 수도 있다고 생각함.
+    private String address;         // 주소
 }

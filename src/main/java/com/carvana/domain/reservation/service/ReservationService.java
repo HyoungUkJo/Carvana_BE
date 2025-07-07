@@ -14,6 +14,8 @@ import com.carvana.domain.store.carwash.repository.CarWashRepository;
 import com.carvana.global.exception.custom.ReservationException;
 import com.carvana.global.notification.service.FcmService;
 import com.carvana.global.notification.service.NotificationService;
+import com.carvana.global.storage.service.PresignedUrlService;
+import com.carvana.global.storage.service.StorageService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cglib.core.Local;
@@ -24,6 +26,7 @@ import java.time.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +41,9 @@ public class ReservationService {
     private final ReviewRepository reviewRepository;
 
     // 사진같은 파일을 올릴 FileUploadService도 필요
+    private final StorageService storageService;
+    // presignedUrl을 만들 PresginedUrlsService 의존선 주입
+    private final PresignedUrlService presignedUrlService;
 
     private final CarWashRepository carWashRepository;
     private final CarWashMenuRepository carWashMenuRepository;
@@ -132,6 +138,7 @@ public class ReservationService {
     @Transactional
     public ReservationResponseDto createReservation(ReservationRequestDto request) {
 
+
         // 요청 엔티티 조회 (회원, 세차장, 메뉴)
         CustomerMember customerMember = customerMemberRepository.findById(request.getCustomerMemberID())
             .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다."));
@@ -139,24 +146,32 @@ public class ReservationService {
         CarWash carWash = carWashRepository.findById(request.getCarWashId())
             .orElseThrow(() -> new EntityNotFoundException("세차장을 찾을 수 없습니다."));
 
-//        CarWashMenu carWashMenu = carWashMenuRepository.findById(request.getMenuId())
-//            .orElseThrow(() -> new EntityNotFoundException("메뉴를 찾을 수 없습니다."));
-
         // 이미지 처리
-        // TODO : 이미지 저장 로직 작성
-        String imageUrl = null;
+        // 예약을 식별하기 위한 uuid 생성
+        String reservationUUID = UUID.randomUUID().toString();
+        List<String> imageKeys = null;
 
-        // 예약 엔티티 생성
+        if(request.getImages() != null && !request.getImages().isEmpty()) {
+            // 이미지 업로드 후 image key를 받아온다.
+            System.out.println("이미지 디버깅:"+request.getImages());
+            imageKeys = request.getImages().stream()
+                .filter(file -> !file.isEmpty())
+                .map(image -> storageService.uploadFile(image, "reservation", reservationUUID))
+                .toList();
+        }
+
+        //예약 엔티티 생성
         Reservation reservation = Reservation.builder()
+            .uuid(reservationUUID)
             .customerMember(customerMember)
             .carWash(carWash)
             .carType(request.getCarType())
             .carNumber(request.getCarNumber())
             .reservationDateTime(request.getReservationDateTime())
             .request(request.getRequest())
+            .imageKeys(imageKeys)
             .createAt(LocalDateTime.now())
             .bayNumber(request.getBayNumber())
-//            .imgUrl(imageUrl)
             .build();
 
         // 선택한 메뉴들을 예약에 추가
@@ -193,7 +208,6 @@ public class ReservationService {
             if (isTimeOverlap(requestReservationStart,requestReservationEnd,existingStart,existingEnd)) {
                 throw new ReservationException("해당 시간에 이미 예약이 존재합니다.");
             }
-
         }
 
         // 저장
@@ -205,102 +219,29 @@ public class ReservationService {
         // 예약 요청 알림
         notificationService.createReservationNotification(customerMember,reservation);
 
+        List<String> imageUrls = null;
+        if(imageKeys != null) {
+            // 테스트로 presignedUrl 만들어서 그걸 리턴
+            imageUrls = getPresignedUrls(imageKeys, 60);
+        }
+
         // 결과
         return ReservationResponseDto.builder()
             .reservationId(savedReservation.getId())
             .reservationDateTime(savedReservation.getReservationDateTime())
             .request(savedReservation.getRequest())
-            .imageUrl(savedReservation.getImgUrl())
+            .imageUrl(imageUrls)
             .carType(savedReservation.getCarType())
             .carNumber(reservation.getCarNumber())
             .bayNumber(reservation.getBayNumber())
             .status(savedReservation.getStatus())
+//            .menuList() // 메뉴 리스트를 추가해야함.
             .build();
-    }
 
-    // 처리되지 않은 예약 요청
-    public List<ReservationResponseDto> requestedPendingReservation(Long carWashId) {
-        List<Reservation> reservationList = reservationRepository.findByCarWashIdAndStatusOrderByCreateAtDesc(carWashId, ReservationStatus.PENDING);
-
-
-        return reservationList.stream()
-            .map(reservation -> ReservationResponseDto.builder()
-                .reservationId(reservation.getId())
-                .reservationDateTime(reservation.getReservationDateTime())
-                .request(reservation.getRequest())
-                .imageUrl(reservation.getImgUrl())
-                .carType(reservation.getCarType())
-                .carNumber(reservation.getCarNumber())
-                .status(reservation.getStatus())
-                .bayNumber(reservation.getBayNumber())
-                .menuList(reservation.getMenuNameList())
-                .build()).collect(Collectors.toList());
-    }
-
-    // 일정 기간의 매출
-    public MonthlyStatsDto getMonthlyStats(Long carWashId) {
-        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).with(LocalTime.MIN);
-        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusNanos(1);
-
-        // 1. 예약리스트를가지고온다.
-        List<Reservation> completedReservations = reservationRepository.findByCarWashIdAndStatusAndReservationDateTimeBetweenOrderByReservationDateTime(
-            carWashId, ReservationStatus.COMPLETED, startOfMonth, endOfMonth
-        );
-
-        // 2. 리뷰를 가지고온다.
-        int reviewCount = reviewRepository.countByCarWashIdAndCreatedAtBetween(carWashId, startOfMonth, endOfMonth);
-
-        //3. 예약 리스트에서 예약 수와 매출액을 리뷰와 함께 return한다.
-        return MonthlyStatsDto.builder()
-            .totalReservation(completedReservations.size())
-            .totalRevenue(completedReservations.stream()
-                .mapToInt(revenue->revenue.calculateTotalPrice())
-                .sum())
-            .totalReviews(reviewCount)
-            .build();
-    }
-
-    // 예약 수락 거절
-    @Transactional
-    public ReservationUpdateResponseDto updateReservationstatus(Long reservationId, ReservationUpdateRequestDto requestDto) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-            .orElseThrow(() -> new EntityNotFoundException("예약을 찾을 수 없습니다."));
-
-        reservation.updateStatus(requestDto);
-
-        // 예약 요청 알림
-        notificationService.createReservationNotification(reservation.getCustomerMember(),reservation);
-
-
-        return ReservationUpdateResponseDto.builder()
-            .reservationId(reservationId)
-            .status(reservation.getStatus())
-            .updatedAt(LocalDateTime.now())
-            .build();
-    }
-
-    // 한달간의 예약 현황
-    public List<ReservationResponseDto> getMonthlyReservation(Long carWashId, int year, int month) {
-        LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);
-        LocalDateTime end = start.plusMonths(1).minusNanos(1);
-        List<ReservationStatus> targetStatus = Arrays.asList(ReservationStatus.PENDING, ReservationStatus.COMPLETED, ReservationStatus.CONFIRMED);
-        // List<Reservation> reservations = reservationRepository.findByCarWashIdAndReservationDateTimeBetweenOrderByReservationDateTime(carWashId, start, end);
-        List<Reservation> reservations = reservationRepository.findByCarWashIdAndReservationDateTimeBetweenAndStatusIn(carWashId, start, end, targetStatus);
-        return reservations.stream()
-            .map(reservation -> ReservationResponseDto.builder()
-                .reservationId(reservation.getId())
-                .reservationDateTime(reservation.getReservationDateTime())
-                .carType(reservation.getCarType())
-                .carNumber(reservation.getCarNumber())
-                .request(reservation.getRequest())
-                .imageUrl(reservation.getImgUrl())
-                .status(reservation.getStatus())
-                .bayNumber(reservation.getBayNumber())
-                .menuList(reservation.getMenuNameList())
-                .build()).collect(Collectors.toList());
     }
 
     // 예약 전체
+    // Todo : OwnerReservationService로 이동
     public List<ReservationResponseDto> getMyReservation(Long customerId) {
         CustomerMember customerMember = customerMemberRepository.findById(customerId).orElseThrow(() -> new EntityNotFoundException("요청한 회원이 없습니다."));
 
@@ -313,7 +254,7 @@ public class ReservationService {
                 .carType(reservation.getCarType())
                 .carNumber(reservation.getCarNumber())
                 .request(reservation.getRequest())
-                .imageUrl(reservation.getImgUrl())
+                .imageUrl(getPresignedUrls(reservation.getImageKeys(),60))
                 .status(reservation.getStatus())
                 .bayNumber(reservation.getBayNumber())
                 .menuList(reservation.getMenuNameList())
@@ -321,26 +262,11 @@ public class ReservationService {
             .collect(Collectors.toList());
     }
 
-    // 오늘의 예약 현황
-    public List<ReservationResponseDto> getTodayReservation(Long carWashId) {
 
-        LocalDateTime startDateTime = LocalDateTime.now().with(LocalTime.MIN);  // 오늘 00:00:00
-        LocalDateTime endDateTime = LocalDateTime.now().with(LocalTime.MAX);    // 오늘 23:59:59.999999999
-
-        List<Reservation> reservations = reservationRepository.findByCarWashIdAndStatusAndReservationDateTimeBetweenOrderByReservationDateTime(carWashId, ReservationStatus.CONFIRMED, startDateTime, endDateTime);
-
-        return reservations.stream()
-            .map(reservation -> ReservationResponseDto.builder()
-                .reservationId(reservation.getId())
-                .reservationDateTime(reservation.getReservationDateTime())
-                .carType(reservation.getCarType())
-                .carNumber(reservation.getCarNumber())
-                .request(reservation.getRequest())
-                .imageUrl(reservation.getImgUrl())
-                .status(reservation.getStatus())
-                .bayNumber(reservation.getBayNumber())
-                .menuList(reservation.getMenuNameList())
-                .build())
-            .collect(Collectors.toList());
+    // PresignedUrl 생성
+    public List<String> getPresignedUrls(List<String> imageKeys, int expireMinutes) {
+        return imageKeys.stream()
+            .map(key -> presignedUrlService.generatePresignedUrl(key, expireMinutes))
+            .toList();
     }
 }
