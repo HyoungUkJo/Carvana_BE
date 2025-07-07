@@ -3,7 +3,7 @@ name: Deploy to Amazon ECR (Dev)
 on:
   push:
     branches:
-      - main
+      - develop
 
 jobs:
   deploy:
@@ -41,7 +41,7 @@ jobs:
       - name: Verify environment variables
         run: |
           echo "ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}"
-          echo "REPOSITORY: ${{ secrets.ECR_REPOSITORY }}"
+          echo "REPOSITORY: ${{ secrets.ECR_DEV_REPOSITORY }}"
           echo "IMAGE_TAG: ${{ github.sha }}"
           echo "Current directory: $(pwd)"
           echo "Dockerfile exists: $(test -f Dockerfile && echo 'yes' || echo 'no')"
