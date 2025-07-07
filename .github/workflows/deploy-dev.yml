@@ -28,7 +28,7 @@ jobs:
       - name: Build, tag, and push Docker image to Dev ECR
         env:
           REGISTRY: ${{ secrets.ECR_REGISTRY }}
-          REPOSITORY: carava/carwash-dev
+          REPOSITORY: ${{ secrets.ECR_DEV_REPOSITORY }}
         run: |
           IMAGE_TAG=latest
           FULL_IMAGE=$REGISTRY/$REPOSITORY:$IMAGE_TAG
