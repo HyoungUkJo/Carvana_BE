@@ -55,7 +55,7 @@ jobs:
 
         run: |
           IMAGE_TAG=dev-$SHORT_SHA
-          IMAGE_URI="${ECR_REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
+          IMAGE_URI=$ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
           echo "Building image: $IMAGE_URI"
           docker build --platform linux/amd64 -t "${IMAGE_URI}" .
           docker push "${IMAGE_URI}"
