@@ -1,4 +1,4 @@
-name: Deploy to Amazon ECR (Dev)
+name: Deploy to Amazon ECR (Prod)
 
 on:
   push:
