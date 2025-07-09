@@ -47,7 +47,7 @@ jobs:
           echo "Dockerfile exists: $(test -f Dockerfile && echo 'yes' || echo 'no')"
       
       - name: Print image tag
-        run: echo "{GITHUB_SHA::8}"
+        run: echo "${{ github.sha::8 }}"
 
       #- name: Build, tag, and push image to Amazon ECR
       #  id: build-image
